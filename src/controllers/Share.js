@@ -1,4 +1,5 @@
-const shareModel = require("../models/share")
+const shareModel = require("../models/share");
+const { getId, incrementId } = require("./Ipo");
 
 const getSharePrice = async (shareId) => {
     return await shareModel.find({ 'shareId': shareId }).select('sharePrice');
@@ -6,11 +7,19 @@ const getSharePrice = async (shareId) => {
 
 const addShare = async (shareName, shareSymbol, sharePrice, shareQty) => {
 
-    const shareId = await axios.get('htt')
+    const shareId = await getId();
 
-    shareModel({
-        shareId: 
-    })
+    await shareModel({
+        shareId: shareId,
+        shareName: shareName,
+        shareSymbol: shareSymbol,
+        sharePrice: sharePrice,
+        shareQty: shareQty
+    }).save()
+
+    await incrementId(shareId);
+
+    return 200;
 }
 
-module.exports = { getSharePrice }
+module.exports = { getSharePrice, addShare }
