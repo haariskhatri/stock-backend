@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { getSharePrice } = require("../controllers/Share");
+const { getSharePrice, addShare } = require("../controllers/Share");
 
 const sharerouter = Router();
 
@@ -8,10 +8,12 @@ sharerouter.get('/shareprice', async (req, res) => {
 })
 
 sharerouter.post('/addShare', async (req, res) => {
-    const { shareId, sharePrice, shareQty } = req.body;
+    const { shareName, shareSymbol, sharePrice, shareQty } = req.body;
+    console.log(req.body);
 
     try {
-
+        const newshare = await addShare(shareName, shareSymbol, sharePrice, shareQty);
+        res.sendStatus(newshare, 'success');
     } catch (error) {
         res.sendStatus(400, error);
     }
