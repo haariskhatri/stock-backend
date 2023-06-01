@@ -16,8 +16,16 @@ const slotSchema = mongoose.Schema({
     }
 })
 
+const userIdSchema = mongoose.Schema({
+    user_id: {
+        type: Number,
+        required: true
+    }
+})
+
+
 const slotCounterModel = mongoose.model('slot', slotSchema, 'ids');
 const ipoCounterModel = mongoose.model('ipo', counterSchema, 'ids');
+const userIdModel = mongoose.model('userid', userIdSchema, 'userids');
 
-
-module.exports = { ipoCounterModel, slotCounterModel };
+module.exports = { ipoCounterModel, slotCounterModel, userIdModel };
