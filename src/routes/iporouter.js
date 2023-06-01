@@ -1,16 +1,14 @@
 const express = require('express');
 const { ipoCounterModel } = require('../models/counters');
 const ipoModel = require('../models/ipo');
-const { getallIpo, getActiveIpos } = require('../controllers/Ipo');
+const { getallIpo, getActiveIpos, getId } = require('../controllers/Ipo');
 
 const iporouter = express.Router();
 
 
 
 iporouter.get('/getid', async (req, res) => {
-    const id = await ipoCounterModel.find({});
-
-    res.json({ id: id[0].ipo_id })
+    res.json(await getId());
 })
 
 iporouter.get('/getallipos', async (req, res) => {
