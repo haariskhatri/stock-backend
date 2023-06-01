@@ -19,7 +19,8 @@ const { log } = require('console');
 const { getMaximumSlotsAllowed, getSlotsFilledbyCustomer, checkifUserExists } = require('./src/controllers/Slot');
 const userrouter = require('./src/routes/userrouter');
 const iporouter = require('./src/routes/iporouter');
-const traderouter = require('./src/routes/traderouter')
+const traderouter = require('./src/routes/traderouter');
+const sharerouter = require('./src/routes/sharerouter');
 
 
 const app = express();
@@ -32,6 +33,7 @@ app.use(cors());
 app.use('/user', userrouter);
 app.use('/ipo', iporouter);
 app.use('/trade', traderouter);
+app.use('/share', sharerouter);
 
 
 
