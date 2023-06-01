@@ -17,6 +17,9 @@ const { Server } = require('socket.io');
 const { log } = require('console');
 
 const { getMaximumSlotsAllowed, getSlotsFilledbyCustomer, checkifUserExists } = require('./src/controllers/Slot');
+const userrouter = require('./src/routes/userrouter');
+const iporouter = require('./src/routes/iporouter');
+const traderouter = require('./src/routes/traderouter')
 
 
 const app = express();
@@ -26,12 +29,13 @@ const io = new Server(server, { cors: { origin: 'http://localhost:5173' } });
 app.use(express.json());
 app.use(cors());
 
+app.use('/user', userrouter);
+app.use('/ipo', iporouter);
+app.use('/trade', traderouter);
 
-app.get('/getid', async (req, res) => {
-    const id = await ipoCounterModel.find({});
 
-    res.json({ id: id[0].ipo_id })
-})
+
+
 
 
 
@@ -46,64 +50,12 @@ app.post('/slotrequest', async (req, res) => {
 })
 
 
-app.post('/addipo', async (req, res) => {
-
-    const {
-        companyId,
-        companyName,
-        companySymbol,
-        companyLogo,
-        companyShares,
-        companyValuepershare,
-        companyMinimumSlotSize,
-        companyMaximumSlotSize,
-        companyMaximumSlotsAllowed,
-        companyValuation,
-        companyStartdate,
-        companyEnddate,
-        companyDescription
-    } = req.body;
-
-    console.log(req.body)
-    console.log(companyMaximumSlotsAllowed);
-
-
-
-    const save = await ipoModel({
-        companyId: companyId,
-        companyName: companyName,
-        companySymbol: companySymbol,
-        companyLogo: companyLogo,
-        companyShares: companyShares,
-        companyValuepershare: companyValuepershare,
-        companyMinimumSlotSize: companyMinimumSlotSize,
-        companyMaximumSlotSize: companyMinimumSlotSize,
-        companyMaximumSlotsAllowed: companyMaximumSlotsAllowed,
-        companyValuation: companyShares * companyValuepershare,
-        companyStartdate: companyStartdate,
-        companyEnddate: companyEnddate,
-        companyDescription: companyDescription
-    }).save();
-
-    const updateid = await ipoCounterModel.findOneAndUpdate({ '$inc': { 'ipo_id': 1 } });
-    console.log(updateid);
-    console.log("Saved");
-
-    res.send(true)
-
-})
-
 
 app.get('/check', async (req, res) => {
 
 })
 
-app.post('/addUser', async (req, res) => {
-    const { userName, userFullname } = req.body;
 
-    const newUser = await addUser(userName, userFullname);
-    res.json(newUser);
-})
 
 
 server.listen(4000, () => {
