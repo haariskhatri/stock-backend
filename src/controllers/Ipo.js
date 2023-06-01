@@ -8,6 +8,11 @@ const getId = async () => {
     return id[0].ipo_id;
 }
 
+const incrementId = async (present_value) => {
+    await ipoCounterModel.findOneAndUpdate({ 'ipo_id': present_value }, { '$inc': { 'ipo_id': 1 } });
+    return 200;
+}
+
 const getallIpo = async () => {
     const ipos = await ipoModel.find({});
     console.log(ipos)
@@ -23,6 +28,6 @@ const getActiveIpos = async () => {
 
 
 
-module.exports = { getId, getallIpo, getActiveIpos }
+module.exports = { getId, getallIpo, getActiveIpos, incrementId }
 
 
