@@ -2,11 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose')
 const cors = require('cors');
 
+const addUser = require('./src/controllers/User')
+
 const slotModel = require('./src/models/slot')
 const ipomapsModel = require('./src/models/ipomaps');
 const ipoModel = require('./src/models/ipo')
 
-const { slotCounterModel, ipoCounterModel } = require('./src/models/counters')
+const { slotCounterModel, ipoCounterModel, userIdModel } = require('./src/models/counters')
 
 const { addSlot } = require('./src/controllers/Slot')
 
@@ -31,9 +33,7 @@ app.get('/getid', async (req, res) => {
     res.json({ id: id[0].ipo_id })
 })
 
-app.get('/check', async (req, res) => {
-    res.json(await checkifUserExists(1, 1))
-})
+
 
 app.post('/slotrequest', async (req, res) => {
     const { slotId, customerId, ipoId, slotAmount, slotNumber } = req.body;
@@ -94,6 +94,16 @@ app.post('/addipo', async (req, res) => {
 })
 
 
+app.get('/check', async (req, res) => {
+
+})
+
+app.post('/addUser', async (req, res) => {
+    const { userName, userFullname } = req.body;
+
+    const newUser = await addUser(userName, userFullname);
+    res.json(newUser);
+})
 
 
 server.listen(4000, () => {
