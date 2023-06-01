@@ -47,11 +47,11 @@ const ipoSchema = mongoose.Schema({
         required: true
     },
     companyStartdate: {
-        type: Date,
+        type: String,
         required: true
     },
     companyEnddate: {
-        type: Date,
+        type: String,
         required: true
     },
     companyDescription: {
