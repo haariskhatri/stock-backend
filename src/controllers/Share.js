@@ -2,7 +2,8 @@ const shareModel = require("../models/share");
 const { getId, incrementId } = require("./Ipo");
 
 const getSharePrice = async (shareId) => {
-    return await shareModel.find({ 'shareId': shareId }).select('sharePrice');
+    const price = await shareModel.find({ 'shareId': shareId }).select({ 'sharePrice': 1, '_id': 0 });;
+    return price[0].sharePrice;
 }
 
 const addShare = async (shareName, shareSymbol, sharePrice, shareQty) => {
