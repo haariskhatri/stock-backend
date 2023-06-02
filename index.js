@@ -2,25 +2,21 @@ const express = require('express');
 const mongoose = require('mongoose')
 const cors = require('cors');
 
-const addUser = require('./src/controllers/User')
-
-const slotModel = require('./src/models/slot')
-const ipomapsModel = require('./src/models/ipomaps');
-const ipoModel = require('./src/models/ipo')
-
-const { slotCounterModel, ipoCounterModel, userIdModel } = require('./src/models/counters')
-
-const { addSlot } = require('./src/controllers/Slot')
 
 const http = require('http');
 const { Server } = require('socket.io');
-const { log } = require('console');
 
-const { getMaximumSlotsAllowed, getSlotsFilledbyCustomer, checkifUserExists } = require('./src/controllers/Slot');
+
 const userrouter = require('./src/routes/userrouter');
 const iporouter = require('./src/routes/iporouter');
 const traderouter = require('./src/routes/traderouter');
 const sharerouter = require('./src/routes/sharerouter');
+const { getSharePrice } = require('./src/controllers/Share');
+const { buyOrder, sellOrder, newBuy } = require('./src/controllers/BuySell');
+
+
+
+
 
 
 const app = express();
@@ -35,30 +31,36 @@ app.use('/ipo', iporouter);
 app.use('/trade', traderouter);
 app.use('/share', sharerouter);
 
+io.on('connection', (socket) => {
 
+    socket.on('shareprice', async (data) => {
+        console.log(data);
+        const price = await getSharePrice(data)
+        socket.emit('shareprice', price);
+    })
 
+    socket.on('buyOrder', (data) => {
 
+        buyOrder(data);
+        socket.emit('buysuccess');
+    })
 
+    socket.on('sellOrder', (data) => {
 
+        sellOrder(data);
+        socket.emit('sellsuccess');
+    })
 
-app.post('/slotrequest', async (req, res) => {
-    const { slotId, customerId, ipoId, slotAmount, slotNumber } = req.body;
-
-
-    const newSlot = await addSlot(slotId, customerId, ipoId, slotAmount, slotNumber);
-    res.json(newSlot)
 
 
 })
 
-
-
-app.get('/check', async (req, res) => {
-
-})
-
-
-
+const brodcastBook = () => {
+    io.emit('new order book', {
+        buy: buy.slice(0, 10),
+        sell: sell.slice(0, 10)
+    })
+}
 
 server.listen(4000, () => {
     console.log("Listening");
@@ -66,9 +68,6 @@ server.listen(4000, () => {
     console.log("Mongoose Connected");
 })
 
-io.on('connection', (socket) => {
-    console.log("user connected");
-    socket.emit('message', { message: "Hello from server" })
-})
+
 
 
