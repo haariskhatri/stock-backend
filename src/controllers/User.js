@@ -42,7 +42,7 @@ const addUser = async (
         userId: userId,
         userName: userName,
         userFullName: userFullName,
-        userBalance: 0,
+        userBalance: 100000,
         userOrders: [],
         userPortfolio: [],
         userStatus: 1,
