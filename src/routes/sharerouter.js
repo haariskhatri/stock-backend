@@ -4,7 +4,7 @@ const { getSharePrice, addShare } = require("../controllers/Share");
 const sharerouter = Router();
 
 sharerouter.get('/shareprice', async (req, res) => {
-    res.json(await getSharePricerice(1));
+    res.json(await getSharePrice(req.body));
 })
 
 sharerouter.post('/addShare', async (req, res) => {
