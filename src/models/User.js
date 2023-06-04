@@ -31,7 +31,8 @@ const UserSchema = mongoose.Schema(
             required: true
         },
         userPortfolio: {
-            type: Array,
+            type: Map,
+            of: mongoose.Schema.Types.Mixed,
             required: true
         },
         userStatus: {
