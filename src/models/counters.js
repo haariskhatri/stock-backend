@@ -31,9 +31,10 @@ const tradeIdSchema = mongoose.Schema({
 })
 
 
+
 const slotCounterModel = mongoose.model('slot', slotSchema, 'ids');
 const ipoCounterModel = mongoose.model('ipo', counterSchema, 'ids');
 const userIdModel = mongoose.model('userid', userIdSchema, 'userids');
-const tradeIdModel = mongoose.model('tradeid', tradeIdSchema, 'tradeIds');
+const tradeIdModel = mongoose.model('tradeid', tradeIdSchema, 'tradeids');
 
 module.exports = { ipoCounterModel, slotCounterModel, userIdModel, tradeIdModel };
