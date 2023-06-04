@@ -1,56 +1,49 @@
 const { set } = require("mongoose")
-const { buyModel } = require("../models/Buy")
 const { tradeIdModel } = require("../models/counters")
+const { getShares, addStocktoUser, debitStock, getUserBalance } = require("./User")
+const { addTrade } = require("../models/trades")
+const { assert } = require('assert')
+const { getAllShares } = require("./Share")
+const { log } = require("console")
 
-const buyQueue = []
 
-const sellQueue = []
 
-const getTradeId = async () => {
-    const result = await tradeIdModel.find({});
-    return result[0].trade_id;
-}
+// const getTradeId = async () => {
+//     const result = await tradeIdModel.find({});
+//     return result[0].trade_id;
+// }
 
 const incrementTradeId = async (previous) => {
     const result = await tradeIdModel.findOneAndUpdate({ 'trade_id': previous }, { '$inc': { 'trade_id': 1 } });
     return 200;
 }
 
-const recordBuyOrder = async (stock_id, customer_id, quantity, tradetype, price) => {
+// const recordBuyOrder = async (stock_id, customer_id, quantity, tradetype, price) => {
 
-    const tradeId = await getTradeId();
+//     const tradeId = await getTradeId();
 
-    const buyorder = await buyModel({
-        tradeId: tradeId,
-        customerId: customer_id,
-        stockId: stock_id,
-        tradePrice: price,
-        tradeType: tradetype,
-        tradeQty: quantity
-    }).save();
+//     const buyorder = await buyModel({
+//         tradeId: tradeId,
+//         customerId: customer_id,
+//         stockId: stock_id,
+//         tradePrice: price,
+//         tradeType: tradetype,
+//         tradeQty: quantity
+//     }).save();
 
-    await incrementTradeId(tradeId);
+//     await incrementTradeId(tradeId);
 
-    return 200;
-}
-
-//buyArrays
-
-const bADA = []
-const bREL = []
-const bTATA = []
+//     return 200;
+// }
 
 
-//sell Arrays 
-const sADA = []
-const sREL = []
-const sTATA = []
 
 
 const stockMap = new Map();
 stockMap.set('ADA', [[], []]);
 stockMap.set('REL', [[], []]);
 stockMap.set('TATA', [[], []]);
+
 
 
 // const buyOrder = (data) => {
@@ -75,18 +68,22 @@ stockMap.set('TATA', [[], []]);
 
 
 
-const buyOrder = (data) => {
+const buyOrder = async (data) => {
     const { stockId } = data;
     const stock = stockMap.get(stockId);
     stock[0].push(data);
-    console.log(stockMap.get(stockId));
+    await matchOrder(stockId);
+    console.log(stock);
+
 }
 
-const sellOrder = (data) => {
+const sellOrder = async (data) => {
     const { stockId } = data;
     const stock = stockMap.get(stockId);
     stock[1].push(data);
-    console.log(stockMap.get(stockId));
+    await matchOrder(stockId);
+    console.log(log);
+
 }
 
 // const sellOrder = (data) => {
@@ -109,56 +106,217 @@ const sellOrder = (data) => {
 //     }
 // }
 
-const matchOrder = () => {
-    const stocks = ['ADA', 'REL', 'TATA']
 
-    stocks.forEach((stock) => {
-        const stockArr = stockMap.get(stock);
-        const buy = stockArr[0][0];
 
-        if (buy) {
-            for (var i = 0; i < stockArr[1].length; i++) {
-                const sell = stockArr[1][i];
+// const matchOrder = () => {
+//     const stocks = ['ADA', 'REL', 'TATA']
 
-                //check if price limit is same
-                if (buy.priceLimit >= sell.priceLimit) {
-                    var clearingPrice = (buy.priceLimit + sell.priceLimit) / 2;
+//     stocks.forEach(async (stock) => {
+//         const stockArr = stockMap.get(stock);
+//         const buy = stockArr[0][0];
 
-                    if (buy.shares < sell.shares) {
-                        sell.shares -= buy.shares;
+//         if (buy) {
+//             for (var i = 0; i < stockArr[1].length; i++) {
+//                 const sell = stockArr[1][i];
 
+//                 //check if price limit is same
+//                 if (buy.priceLimit >= sell.priceLimit) {
+
+//                     if (userbalance >= buy.shares * buy.priceLimit) {
+
+//                         var clearingPrice = (buy.priceLimit + sell.priceLimit) / 2;
+
+//                         if (buy.shares < sell.shares) {
+//                             //if buy shares is small than sell shares
+//                             //partially sell the shares 
+//                             const userbalance = await getUserBalance(buy.customerId);
+//                             const sellershares = await getShares(sell.userId, sell.stock);
+
+//                             if (userbalance >= buy.shares * buy.priceLimit) {
+//                                 if (sellershares >= sell.shares) {
+//                                     sell.shares -= buy.shares;
+//                                     await addStocktoUser(buy.userId, buy.stock, buy.shares);
+//                                     await debitStock(sell.userId, sell.stock, buy.shares);
+//                                     await addTrade(buy.userId, sell.userId, buy.stock, buy.shares);
+//                                     console.log('Trade Succesful')
+//                                 }
+//                             }
+
+//                             //else
+//                             //check whether the user has the required balance 
+//                             //check whether the seller has the required shares 
+
+//                             //debit the amount from buyer,
+//                             //debit the seller with shares 
+//                             //credit the amount
+//                             // credit the buyer with the shares
+
+//                         }
+
+
+//                     }
+//                     else {
+//                         console.log("Nothing");
+//                     }
+//                 }
+//             }
+//         }
+
+
+//     })
+// }
+
+// list = [ada , rel]
+// ada = 
+
+//list of stocks
+// everytime buy request comes you have to run the match order function
+// if buy request matches , execute it , else put it in array
+//if sell request  comes , check the buy array for match and when the match is encountered , execute it 
+// terminate
+// 
+
+
+
+const matchOrder = async (stock) => {
+
+    // const data = {
+    //     socketId: '0',
+    //     stockId: 'ADA',
+    //     userId: 4,
+    //     shares: 10,
+    //     price: 100
+    // }
+    // const data2 = {
+    //     socketId: '0',
+    //     stockId: 'ADA',
+    //     userId: 3,
+    //     shares: 10,
+    //     price: 100
+    // }
+
+    // buyOrder(data)
+    // buyOrder(data)
+    // sellOrder(data2)
+    // sellOrder(data2)
+
+    const actualStock = stockMap.get(stock);
+    const buyarr = actualStock[0];
+    const sellarr = actualStock[1];
+
+    if (buyarr.length === 0 || sellarr.length === 0) {
+        return;
+    }
+
+    else {
+
+
+        buyarr.forEach(async (buy, buyIndex) => {
+            for (var i = 0; i < sellarr.length; i++) {
+
+                const sell = sellarr[i];
+
+                if (await getUserBalance(buy.userId) < buy.shares * buy.price || buy.userId === sell.userId) {
+                    console.log('Invalid');
+                    return;
+                }
+
+                else {
+
+                    if (buy.price === sell.price) {
+
+
+                        if (buy.shares < sell.shares) {
+
+                            if (await getShares(sell.userId, sell.stockId) < buy.shares) {
+                                return;
+                            }
+                            else {
+                                await debitStock(sell.userId, sell.stockId, buy.shares);
+                                await addStocktoUser(buy.userId, sell.stockId, buy.shares);
+                                await addTrade(buy.userId, sell.userId, buy.stockId, buy.shares, buy.price);
+                                sell.shares -= buy.shares;
+                                buyarr.splice(buyIndex, 1);
+                                break;
+                            }
+                        }
+
+                        if (buy.shares === sell.shares) {
+                            if (await getShares(sell.userId, sell.stock) < buy.shares) {
+                                return;
+                            }
+                            else {
+                                await debitStock(sell.userId, sell.stockId, buy.shares);
+                                await addStocktoUser(buy.userId, sell.stockId, buy.shares);
+                                await addTrade(buy.userId, sell.userId, buy.stockId, buy.shares, buy.price);
+                                buyarr.splice(buyIndex, 1)
+                                sellarr.splice(i, 1);
+                                break;
+                            }
+                        }
+
+                        if (buy.shares > sell.shares) {
+                            return;
+                        }
 
                     }
                 }
             }
-        }
+        });
+    }
+
+    // if (await getUserBalance(buy.userId) < buy.price * buy.shares || buy.userId === sell.userId) {
+    //     console.log('Invalid');
+    //     return;
+    // }
+
+    // else {
+
+    //     if (buy.price === sell.price) {
 
 
-    })
+    //         if (buy.shares < sell.shares) {
+
+    //             if (await getShares(sell.userId, sell.stock) < buy.shares) {
+    //                 return;
+    //             }
+    //             else {
+    //                 await debitStock(sell.userId, sell.stock, buy.shares);
+    //                 await addStocktoUser(buy.userId, sell.stock, buy.shares);
+    //                 await addTrade(buy.userId, sell.userId, buy.stock, buy.shares, buy.price);
+    //                 ADA[0].shift();
+    //                 console.log(ADA);
+    //             }
+    //         }
+
+    //         if (buy.shares === sell.shares) {
+    //             if (await getShares(sell.userId, sell.stock) < buy.shares) {
+    //                 return;
+    //             }
+    //             else {
+    //                 await debitStock(sell.userId, sell.stock, buy.shares);
+    //                 await addStocktoUser(buy.userId, sell.stock, buy.shares);
+    //                 await addTrade(buy.userId, sell.userId, buy.stock, buy.shares, buy.price);
+    //                 ADA[0].shift();
+    //                 ADA[1].shift();
+    //                 console.log(ADA);
+    //             }
+    //         }
+
+    //         if (buy.shares > sell.shares) {
+    //             return;
+    //         }
+
+    //     }
+    // }
 }
 
-// const matchOrder = () => {
-//     const list = ['ADA', 'REL', 'TATA'];
-
-//     list.map((stock) => {
-
-//         ('b' + stock).push()
-
-//         switch (stock) {
-//             case 'ADA':
-//                 const buy = bADA.splice(0, 10);
-//                 const sell = sADA.splice(0, 10)
-
-
-//         }
-//     })
-// }
-
 module.exports = {
-    getTradeId,
+
     incrementTradeId,
-    recordBuyOrder,
     buyOrder,
-    sellOrder
+    sellOrder,
+    matchOrder,
+
 
 }
