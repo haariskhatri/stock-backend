@@ -1,5 +1,4 @@
 const { set } = require("mongoose")
-const { buyModel } = require("../models/Buy")
 const { tradeIdModel } = require("../models/counters")
 
 const buyQueue = []
