@@ -34,18 +34,22 @@ const getUserId = async () => {
 
 const addUser = async (
     userName,
-    userFullName
+    email,
+    passwordHash,
+    confirmationCode
 ) => {
     const userId = await getUserId();
 
     const newuser = userModel({
         userId: userId,
         userName: userName,
-        userFullName: userFullName,
+        email:email,
+        password:passwordHash,
+        confirmationCode:confirmationCode,
         userBalance: 100000,
         userOrders: [],
         userPortfolio: [],
-        userStatus: 1,
+        userStatus: 0,
         created: (new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate())
     })
 
