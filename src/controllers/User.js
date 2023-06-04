@@ -70,6 +70,28 @@ const addUser = async (
 
     return incremented && added;
 
+
 }
 
-module.exports = addUser;
+
+const addStocktoUser = async (userId, stock, shares) => {
+    const addstock = await userModel.updateOne({ 'userId': userId }, { '$inc': { [`userPortfolio.${stock}`]: parseInt(shares) } })
+    return 200;
+}
+
+const getUserBalance = async (userId) => {
+    const result = await userModel.findOne({ 'userId': userId });
+    return result.userBalance;
+}
+
+const debitStock = async (userId, stock, shares) => {
+    await userModel.updateOne({ 'userId': userId }, { '$inc': { [`userPortfolio.${stock}`]: (-1 * shares) } })
+    return 200;
+}
+
+const getShares = async (userId, stock) => {
+    const result = await userModel.findOne({ 'userId': userId })
+    return result.userPortfolio.get(stock);
+}
+
+module.exports = { addUser, getUserBalance, addStocktoUser, debitStock, getShares };
