@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose')
 const cors = require('cors');
+const upload = require('express-fileupload');
+const path = require('path');
 
 
 const http = require('http');
@@ -11,8 +13,10 @@ const userrouter = require('./src/routes/userrouter');
 const iporouter = require('./src/routes/iporouter');
 const traderouter = require('./src/routes/traderouter');
 const sharerouter = require('./src/routes/sharerouter');
-const { getSharePrice } = require('./src/controllers/Share');
-const { buyOrder, sellOrder, newBuy } = require('./src/controllers/BuySell');
+const { getSharePrice, getAllShares } = require('./src/controllers/Share');
+const { buyOrder, sellOrder, newBuy, print, matchOrder } = require('./src/controllers/BuySell');
+const { getUserBalance, addStocktoUser, debitStock, getShares } = require('./src/controllers/User');
+const { getTradeId, incrementTradeId } = require('./src/models/trades');
 
 
 
@@ -26,10 +30,17 @@ const io = new Server(server, { cors: { origin: 'http://localhost:5173' } });
 app.use(express.json());
 app.use(cors());
 
-app.use('/user', userrouter);
-app.use('/ipo', iporouter);
-app.use('/trade', traderouter);
-app.use('/share', sharerouter);
+app.use('/api/user', userrouter);
+app.use('/api/ipo', iporouter);
+app.use('/api/trade', traderouter);
+app.use('/api/share', sharerouter);
+
+app.use(upload({
+    limits: {
+        fileSize: 50 * 1024 * 1024
+    }
+}))
+app.use('/public', express.static(path.join(__dirname, 'public', 'logos')))
 
 io.on('connection', (socket) => {
 
@@ -55,12 +66,24 @@ io.on('connection', (socket) => {
 
 })
 
-const brodcastBook = () => {
-    io.emit('new order book', {
-        buy: buy.slice(0, 10),
-        sell: sell.slice(0, 10)
-    })
-}
+const buy = [
+    {
+        socketId: 'AvGvetHFxETMHmXLAAGd',
+        stockId: 'ADA',
+        userId: 3,
+        shares: '10',
+        price: '10'
+    },
+    {
+        socketId: 'PhlJsz6tU479J-RbAAHD',
+        stockId: 'ADA',
+        userId: 3,
+        shares: '10',
+        price: '100'
+    }
+]
+
+
 
 server.listen(4000, () => {
     console.log("Listening");
