@@ -7,6 +7,7 @@ const app = express();
 const io = new Server({ cors: { origin: 'http://localhost:5173' } });
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
+const { isAuth, Authjwt } = require('../routes/iporouter')
 
 app.use(express.json());
 app.use(cors());
@@ -50,6 +51,10 @@ loginrouter.get('/logout', async (req, res) => {
   req.session.destroy();
   res.clearCookie("jwt");
   res.json({ success: true, message: "You Are Loged Out" })
+})
+
+loginrouter.get('/usernow', isAuth, Authjwt, (req, res) => {
+  res.json({ 'id': req.session.userId, 'email': req.session.email });
 })
 
 
