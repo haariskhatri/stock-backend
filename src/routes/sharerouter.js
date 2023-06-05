@@ -1,10 +1,16 @@
 const { Router } = require("express");
-const { getSharePrice, addShare } = require("../controllers/Share");
+const { getSharePrice, addShare, getTopShares } = require("../controllers/Share");
 
 const sharerouter = Router();
 
 sharerouter.get('/shareprice', async (req, res) => {
     res.json(await getSharePrice(req.body));
+})
+
+sharerouter.get('/gettopshares', (req, res) => {
+    getTopShares().then((data) => {
+        res.json(data);
+    })
 })
 
 sharerouter.post('/addShare', async (req, res) => {
