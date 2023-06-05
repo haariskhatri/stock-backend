@@ -18,10 +18,6 @@ const UserSchema = mongoose.Schema(
             type:String,
             required:true
         },
-        confirmationCode: {
-          type: String,
-          unique: true
-        },
         userBalance: {
             type: Number,
             required: true

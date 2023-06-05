@@ -5,9 +5,8 @@ const nodemailer = require('nodemailer');
 const session = require("express-session");
 const MongoDBSession = require("connect-mongodb-session")(session);
 const bcrypt = require("bcrypt")
-const cookieparser = require('cookie-parser');
+const cookie = require('cookie-parser');
 const jwt = require('jsonwebtoken');
-const UserSession = require('./SessionModel')
 
 const http = require('http');
 const { Server } = require('socket.io');
@@ -28,13 +27,35 @@ const userModel = require('./src/models/User');
 const { addUser, creditBalance, debitBalance } = require('./src/controllers/User');
 const sendMail = require('./src/controllers/Mail');
 const path = require('path');
+const sharesrouter = require('./src/routes/sharesrouter');
+const signuprouter = require('./src/routes/signuprouter');
+const loginrouter = require('./src/routes/loginrouter');
+const adminloginrouter = require('./src/routes/adminloginrouter');
 
 
 
 
 const app = express();
 const server = http.createServer(app)
-const io = new Server(server, { cors: { origin: 'http://localhost:5173' } });
+const io = new Server({ cors: { origin: 'http://localhost:5173' } });
+const store = new MongoDBSession({
+    uri: 'mongodb+srv://root:Haaris8785@cluster0.walzl.mongodb.net/stock',
+    collection: "mySessionsss"
+})
+
+app.use(
+    session({
+        secret: "key that will sign cookie",
+        resave: false,
+        saveUninitialized: false,
+        store: store,
+        cookie: {
+            maxAge: 24 * 60 * 60 * 1000
+        }
+    })
+);
+app.use(cookie())
+
 
 app.use(express.json());
 app.use(cors());
@@ -42,11 +63,15 @@ app.use(bodyParser.json());
 
 
 
-app.use('/api/user', userrouter);
-app.use('/api/ipo', iporouter);
-app.use('/api/trade', traderouter);
-app.use('/api/share', sharerouter);
+app.use('/api/api/user', userrouter);
+app.use('/api/api/ipo', iporouter);
+app.use('/api/api/trade', traderouter);
+app.use('/api/api/share', sharerouter);
 app.use('/public', express.static(path.join(__dirname, 'images')))
+app.use('/api/shares', sharesrouter);
+app.use('/api/signup', signuprouter);
+app.use('/api/login', loginrouter);
+app.use('/api/adminlogin', adminloginrouter);
 
 io.on('connection', (socket) => {
 
@@ -68,28 +93,8 @@ io.on('connection', (socket) => {
         socket.emit('sellsuccess');
     })
 
-
-
-
-
 })
 
-const store = new MongoDBSession({
-    uri: 'mongodb+srv://root:Haaris8785@cluster0.walzl.mongodb.net/stock',
-    collection: "mySessionsss"
-})
-
-app.use(
-    session({
-        secret: "key that will sign cookie",
-        resave: false,
-        saveUninitialized: false,
-        store: store,
-        cookie: {
-            maxAge: 24 * 60 * 60 * 1000
-        }
-    })
-);
 
 
 const brodcastBook = () => {
