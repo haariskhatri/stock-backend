@@ -78,6 +78,14 @@ const addStocktoUser = async (userId, stock, shares) => {
     return 200;
 }
 
+const debitBalance = async (userId, amount) => {
+    await userModel.updateOne({ 'userId': userId }, { '$inc': { 'userBalance': - amount } })
+}
+
+const creditBalance = async (userId, amount) => {
+    await userModel.updateOne({ 'userId': userId }, { '$inc': { 'userBalance': amount } })
+}
+
 const getUserBalance = async (userId) => {
     const result = await userModel.findOne({ 'userId': userId });
     return result.userBalance;
@@ -95,4 +103,4 @@ const getShares = async (userId, stock) => {
 
 
 
-module.exports = { addUser, getUserBalance, addStocktoUser, debitStock, getShares };
+module.exports = { addUser, getUserBalance, addStocktoUser, debitStock, getShares, debitBalance, creditBalance };

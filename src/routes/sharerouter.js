@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { getSharePrice, addShare, getTopShares, getShare } = require("../controllers/Share");
+const { getSharePrice, addShare, getTopShares, getShare, getAllShares } = require("../controllers/Share");
 
 const sharerouter = Router();
 const isAuth = (req, res, next) => {
@@ -33,6 +33,12 @@ sharerouter.get('/shareprice', isAuth, Authjwt, async (req, res) => {
     res.json(await getSharePrice(req.body));
 })
 
+sharerouter.get('/getshares', (req, res) => {
+    return getAllShares().then((data) => {
+        res.json(data);
+    })
+})
+
 sharerouter.get('/gettopshares', (req, res) => {
     getTopShares().then((data) => {
         res.json(data);
@@ -41,17 +47,18 @@ sharerouter.get('/gettopshares', (req, res) => {
 
 sharerouter.post('/getshare', (req, res) => {
     const shareId = req.body.shareId;
+    console.log(shareId);
     getShare(shareId).then((data) => {
         res.json(data);
     })
 })
 
-sharerouter.post('/addShare', isAuth, Authjwt, async (req, res) => {
-    const { shareName, shareSymbol, sharePrice, shareQty } = req.body;
+sharerouter.post('/addShare', async (req, res) => {
+    const { shareName, shareSymbol, sharePrice, shareQty, description, category } = req.body;
 
 
     try {
-        const newshare = await addShare(shareName, shareSymbol, sharePrice, shareQty);
+        const newshare = await addShare(shareName, shareSymbol, sharePrice, shareQty, description, category);
         res.sendStatus(newshare, 'success');
     } catch (error) {
         res.sendStatus(400, error);
