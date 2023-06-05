@@ -75,6 +75,7 @@ const buyOrder = async (data) => {
     stock[0].push(data);
     await matchOrder(stockId);
     console.log(stock);
+    console.log(data);
 
 }
 
