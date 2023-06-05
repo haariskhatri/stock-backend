@@ -24,7 +24,7 @@ const { getSharePrice, getShare } = require('./src/controllers/Share');
 const { buyOrder, sellOrder, newBuy } = require('./src/controllers/BuySell');
 const shareModel = require('./src/models/share');
 const userModel = require('./src/models/User');
-const { addUser } = require('./src/controllers/User');
+const { addUser, addStocktoUser, debitBalance, creditBalance } = require('./src/controllers/User');
 const sharesrouter = require('./src/routes/sharesrouter');
 const signuprouter = require('./src/routes/signuprouter');
 const loginrouter = require('./src/routes/loginrouter');
@@ -73,6 +73,8 @@ app.use('/api/login', loginrouter);
 app.use('/api/adminlogin', adminloginrouter);
 app.use('/public', express.static(path.join(__dirname, 'images')))
 
+
+
 io.on('connection', (socket) => {
 
     socket.on('shareprice', async (data) => {
@@ -82,7 +84,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('buyOrder', (data) => {
-
         buyOrder(data);
         socket.emit('buysuccess');
     })
@@ -103,6 +104,7 @@ const brodcastBook = () => {
         sell: sell.slice(0, 10)
     })
 }
+
 
 
 server.listen(4000, () => {
