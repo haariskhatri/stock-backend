@@ -69,7 +69,7 @@ const addTrade = async (
 
     await incrementTradeId();
 
-    return 200;
+    return tradeId;
 
 }
 
