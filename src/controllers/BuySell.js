@@ -1,10 +1,11 @@
 const { set } = require("mongoose")
 const { tradeIdModel } = require("../models/counters")
-const { getShares, addStocktoUser, debitStock, getUserBalance } = require("./User")
+const { getShares, addStocktoUser, debitStock, getUserBalance, debitBalance, creditBalance } = require("./User")
 const { addTrade } = require("../models/trades")
 const { assert } = require('assert')
 const { getAllShares } = require("./Share")
 const { log } = require("console")
+const sendMail = require("./Mail")
 
 
 
@@ -232,9 +233,14 @@ const matchOrder = async (stock) => {
                                 return;
                             }
                             else {
+
                                 await debitStock(sell.userId, sell.stockId, buy.shares);
+                                await debitBalance(buy.userId, buy.shares * buy.price);
                                 await addStocktoUser(buy.userId, sell.stockId, buy.shares);
-                                await addTrade(buy.userId, sell.userId, buy.stockId, buy.shares, buy.price);
+                                await creditBalance(sell.userId, buy.shares * buy.price)
+                                const id = await addTrade(buy.userId, sell.userId, buy.stockId, buy.shares, buy.price);
+                                sendMail(buy.userEmail, id, 'Buy', buy.stockId, buy.shares, 'debit', buy.shares * buy.price);
+                                sendMail(sell.userEmail, id, 'Sell', sell.stockId, sell.shares, 'credit', buy.shares * buy.price);
                                 sell.shares -= buy.shares;
                                 buyarr.splice(buyIndex, 1);
                                 break;
@@ -247,8 +253,14 @@ const matchOrder = async (stock) => {
                             }
                             else {
                                 await debitStock(sell.userId, sell.stockId, buy.shares);
+                                await debitBalance(buy.userId, buy.shares * buy.price);
+
+
                                 await addStocktoUser(buy.userId, sell.stockId, buy.shares);
-                                await addTrade(buy.userId, sell.userId, buy.stockId, buy.shares, buy.price);
+                                await creditBalance(sell.userId, buy.shares * buy.price)
+                                const id = await addTrade(buy.userId, sell.userId, buy.stockId, buy.shares, buy.price);
+                                sendMail(buy.userEmail, id, 'Buy', buy.stockId, buy.shares, 'debit', buy.shares * buy.price);
+                                sendMail(sell.userEmail, id, 'Sell', sell.stockId, sell.shares, 'credit', sell.shares * sell.price);
                                 buyarr.splice(buyIndex, 1)
                                 sellarr.splice(i, 1);
                                 break;
