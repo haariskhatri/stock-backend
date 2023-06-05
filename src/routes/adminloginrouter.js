@@ -40,7 +40,7 @@ const isAuth = (req, res, next) => {
 
 adminloginrouter.get('/admincompony',isAuth,Authjwt,async(req,res)=>{
     const data=ipoModel.find();
-    console.log(data)
+   
     
 })
 

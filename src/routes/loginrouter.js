@@ -16,7 +16,6 @@ const loginrouter = express.Router();
 
 loginrouter.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  console.log("hello");
   const user = await userModel.find({ "email": email });
 
   const session = await UserSession.find({ "email": email });

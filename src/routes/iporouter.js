@@ -20,7 +20,7 @@ const isAuth = (req, res, next) => {
   const Authjwt = (req, res, next) => {
     
     const token = req?.cookies?.jwt;
-    console.log(req.cookies);
+   
     if (token) {
       jwt.verify(token, 'my-secret-key', (err, decode) => {
         if (err) {

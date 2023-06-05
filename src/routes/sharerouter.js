@@ -35,7 +35,7 @@ sharerouter.get('/shareprice',isAuth,Authjwt, async (req, res) => {
 
 sharerouter.post('/addShare',isAuth,Authjwt, async (req, res) => {
     const { shareName, shareSymbol, sharePrice, shareQty } = req.body;
-    console.log(req.body);
+    
 
     try {
         const newshare = await addShare(shareName, shareSymbol, sharePrice, shareQty);

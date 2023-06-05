@@ -15,7 +15,6 @@ const incrementId = async (present_value) => {
 
 const getallIpo = async () => {
     const ipos = await ipoModel.find({});
-    console.log(ipos)
     return ipos;
 }
 
