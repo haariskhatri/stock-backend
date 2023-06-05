@@ -19,6 +19,14 @@ iporouter.get('/getactiveipos', async (req, res) => {
     res.json(await getActiveIpos());
 })
 
+iporouter.post('/getipo', async (req, res) => {
+    console.log(req.body);
+    ipoModel.findOne({ 'companyId': req.body.companyId }).then((data) => {
+        res.json(data)
+    })
+})
+
+
 iporouter.post('/addipo', async (req, res) => {
 
     const {
