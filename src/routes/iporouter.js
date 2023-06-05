@@ -20,7 +20,7 @@ const isAuth = (req, res, next) => {
 const Authjwt = (req, res, next) => {
 
     const token = req?.cookies?.jwt;
-   
+
     if (token) {
         jwt.verify(token, 'my-secret-key', (err, decode) => {
             if (err) {
@@ -125,4 +125,4 @@ iporouter.post('/addipo', isAuth, Authjwt, async (req, res) => {
 
 
 
-module.exports = iporouter;
+module.exports = { iporouter, isAuth, Authjwt };
