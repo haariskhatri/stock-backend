@@ -36,15 +36,15 @@ const addUser = async (
     userName,
     email,
     passwordHash,
-    
+
 ) => {
     const userId = await getUserId();
 
     const newuser = userModel({
         userId: userId,
         userName: userName,
-        email:email,
-        password:passwordHash,
+        email: email,
+        password: passwordHash,
         userBalance: 100000,
         userOrders: [],
         userPortfolio: [],
@@ -92,5 +92,7 @@ const getShares = async (userId, stock) => {
     const result = await userModel.findOne({ 'userId': userId })
     return result.userPortfolio.get(stock);
 }
+
+
 
 module.exports = { addUser, getUserBalance, addStocktoUser, debitStock, getShares };
