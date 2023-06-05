@@ -17,10 +17,10 @@ const ipomodel = require('./src/models/ipo');
 
 
 const userrouter = require('./src/routes/userrouter');
-const iporouter = require('./src/routes/iporouter');
+const { iporouter } = require('./src/routes/iporouter');
 const traderouter = require('./src/routes/traderouter');
 const sharerouter = require('./src/routes/sharerouter');
-const { getSharePrice } = require('./src/controllers/Share');
+const { getSharePrice, getShare } = require('./src/controllers/Share');
 const { buyOrder, sellOrder, newBuy } = require('./src/controllers/BuySell');
 const shareModel = require('./src/models/share');
 const userModel = require('./src/models/User');
@@ -95,12 +95,15 @@ io.on('connection', (socket) => {
 
 })
 
+io.listen(8000);
+
 const brodcastBook = () => {
     io.emit('new order book', {
         buy: buy.slice(0, 10),
         sell: sell.slice(0, 10)
     })
 }
+
 
 server.listen(4000, () => {
     console.log("Listening");
