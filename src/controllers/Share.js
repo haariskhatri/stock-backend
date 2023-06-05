@@ -28,4 +28,8 @@ const addShare = async (shareName, shareSymbol, sharePrice, shareQty) => {
     return 200;
 }
 
-module.exports = { getSharePrice, addShare, getAllShares }
+const getTopShares = async () => {
+    return await shareModel.find({}).sort({ sharePrice: 'desc' });
+}
+
+module.exports = { getSharePrice, addShare, getAllShares, getTopShares }
