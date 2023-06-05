@@ -36,7 +36,7 @@ const addUser = async (
     userName,
     email,
     passwordHash,
-    confirmationCode
+    
 ) => {
     const userId = await getUserId();
 
@@ -45,7 +45,6 @@ const addUser = async (
         userName: userName,
         email:email,
         password:passwordHash,
-        confirmationCode:confirmationCode,
         userBalance: 100000,
         userOrders: [],
         userPortfolio: [],
