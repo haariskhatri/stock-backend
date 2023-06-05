@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { getSharePrice, addShare, getTopShares } = require("../controllers/Share");
+const { getSharePrice, addShare, getTopShares, getShare } = require("../controllers/Share");
 
 const sharerouter = Router();
 const isAuth = (req, res, next) => {
@@ -39,9 +39,16 @@ sharerouter.get('/gettopshares', (req, res) => {
     })
 })
 
+sharerouter.post('/getshare', (req, res) => {
+    const shareId = req.body.shareId;
+    getShare(shareId).then((data) => {
+        res.json(data);
+    })
+})
+
 sharerouter.post('/addShare', isAuth, Authjwt, async (req, res) => {
     const { shareName, shareSymbol, sharePrice, shareQty } = req.body;
-    
+
 
     try {
         const newshare = await addShare(shareName, shareSymbol, sharePrice, shareQty);
