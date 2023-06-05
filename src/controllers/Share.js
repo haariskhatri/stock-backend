@@ -32,4 +32,8 @@ const getTopShares = async () => {
     return await shareModel.find({}).sort({ sharePrice: 'desc' });
 }
 
-module.exports = { getSharePrice, addShare, getAllShares, getTopShares }
+const getShare = (shareId) => {
+    return shareModel.findOne({ 'shareId': shareId });
+}
+
+module.exports = { getSharePrice, addShare, getAllShares, getTopShares, getShare }
