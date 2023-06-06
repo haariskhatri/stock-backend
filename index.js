@@ -20,11 +20,11 @@ const userrouter = require('./src/routes/userrouter');
 const { iporouter } = require('./src/routes/iporouter');
 const traderouter = require('./src/routes/traderouter');
 const sharerouter = require('./src/routes/sharerouter');
-const { getSharePrice, getShare } = require('./src/controllers/Share');
-const { buyOrder, sellOrder, newBuy } = require('./src/controllers/BuySell');
+const { getSharePrice, getShare, getAllShares, getsharesinit, getShareSymbol } = require('./src/controllers/Share');
+const { buyOrder, sellOrder, newBuy, setstockmap } = require('./src/controllers/BuySell');
 const shareModel = require('./src/models/share');
 const userModel = require('./src/models/User');
-const { addUser, addStocktoUser, debitBalance, creditBalance } = require('./src/controllers/User');
+const { addUser, addStocktoUser, debitBalance, creditBalance, getInvestment, getPrices } = require('./src/controllers/User');
 const sharesrouter = require('./src/routes/sharesrouter');
 const signuprouter = require('./src/routes/signuprouter');
 const loginrouter = require('./src/routes/loginrouter');
@@ -73,15 +73,33 @@ app.use('/api/login', loginrouter);
 app.use('/api/adminlogin', adminloginrouter);
 app.use('/public', express.static(path.join(__dirname, 'images')))
 
+const circuit = 15;
 
 
-io.on('connection', (socket) => {
+
+io.on('connection', async (socket) => {
+    console.log(socket.id)
 
     socket.on('shareprice', async (data) => {
-        console.log(data);
+
         const price = await getSharePrice(data)
         socket.emit('shareprice', price);
     })
+
+    socket.on('investment', async (data) => {
+        console.log(data);
+        const investment = await getInvestment(data);
+        socket.emit('investment', investment);
+    })
+
+    socket.on('givedetail', async () => {
+        await getsharesinit().then(data => {
+            console.log(data)
+            io.emit('detail', data);
+        });
+    })
+
+    socket.emit('circuit', circuit);
 
     socket.on('buyOrder', (data) => {
         buyOrder(data);
@@ -94,22 +112,17 @@ io.on('connection', (socket) => {
         socket.emit('sellsuccess');
     })
 
+
+
 })
 
 io.listen(8000);
 
-const brodcastBook = () => {
-    io.emit('new order book', {
-        buy: buy.slice(0, 10),
-        sell: sell.slice(0, 10)
-    })
-}
 
-
-
-server.listen(4000, () => {
+server.listen(4000, async () => {
     console.log("Listening");
     mongoose.connect('mongodb+srv://root:Haaris8785@cluster0.walzl.mongodb.net/stock')
+    await setstockmap();
     console.log("Mongoose Connected");
 })
 

@@ -11,6 +11,16 @@ const getAllShares = async () => {
     return allstocks;
 }
 
+const getShareSymbol = async () => {
+    return await shareModel.find({}).select({ 'shareSymbol': 1 });
+}
+
+const getsharesinit = async () => {
+    const allstocks = await shareModel.find({}).select({ 'shareSymbol': 1, 'sharePrice': 1 });
+
+    return allstocks;
+}
+
 
 const addShare = async (shareName, shareSymbol, sharePrice, shareQty, description, category) => {
 
@@ -39,4 +49,14 @@ const getShare = (shareId) => {
     return shareModel.findOne({ 'shareId': shareId });
 }
 
-module.exports = { getSharePrice, addShare, getAllShares, getTopShares, getShare, getAllShares }
+module.exports = {
+    getSharePrice,
+    addShare,
+    getAllShares,
+    getTopShares,
+    getShare,
+    getAllShares,
+    getsharesinit,
+    getShareSymbol
+
+}
