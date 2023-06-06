@@ -57,6 +57,12 @@ loginrouter.get('/usernow', isAuth, Authjwt, (req, res) => {
   res.json({ 'id': req.session.userId, 'email': req.session.email });
 })
 
+loginrouter.get('/checksession',(req,res)=>{
+  if(req.session.isAuth)
+  {
+    res.json({success:true})
+  }
+})
 
 
 module.exports = loginrouter;
