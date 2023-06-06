@@ -3,7 +3,8 @@ const { ipoCounterModel } = require('../models/counters');
 const ipoModel = require('../models/ipo');
 const { getallIpo, getActiveIpos, getId } = require('../controllers/Ipo');
 const jwt = require('jsonwebtoken');
-const cookie = require('cookie-parser')
+const cookie = require('cookie-parser');
+const ipomapsModel = require('../models/ipomaps');
 
 
 const iporouter = express.Router();
@@ -58,8 +59,12 @@ iporouter.post('/getipo', async (req, res) => {
 
 
 iporouter.post('/iposub', isAuth, Authjwt, async (req, res) => {
-    const { ipo_id, userid } = req.body;
-    console.log("ipo_id is:", ipo_id, "and userid is ", userid);
+    const { ipo_id } = req.body;
+    console.log(ipo_id);
+    const customerid=req.session.userId;
+    const ipo=new ipomapsModel({customerId:customerid,ipoId:ipo_id,slotAmount:0})
+    await ipo.save()
+    res.json({success:true,message:"Ipo Subscribe Successfully"})
 
 })
 
