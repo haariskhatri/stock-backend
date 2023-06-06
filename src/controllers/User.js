@@ -1,6 +1,7 @@
 // const { userIdModel } = require('../models/counters');
 const userModel = require('../models/User')
 const { userIdModel } = require('../models/counters');
+const shareModel = require('../models/share');
 
 // class User {
 //     constructor(userId, userName, userFullName,) {
@@ -101,6 +102,43 @@ const getShares = async (userId, stock) => {
     return result.userPortfolio.get(stock);
 }
 
+const getPrices = async () => {
+    const result = [(await shareModel.find({}).select({ 'shareSymbol': 1, 'sharePrice': 1 }))];
+
+    const prices = new Map();
+    await result[0].map(ele => {
+        prices.set(ele.shareSymbol, ele.sharePrice);
+    })
+    return prices;
+}
+
+const getInvestment = async (userId,) => {
+
+    if (userId === null) {
+        return 0;
+    }
+    const prices = await getPrices();
+    const result = (await userModel.findOne({ 'userId': userId }).select({ 'userPortfolio': 1 })).userPortfolio;
+    const keys = [...result.keys()];
+    var investment = 0;
+    keys.map(ele => {
+        const shares = result.get(ele);
+        const value = prices.get(ele);
+        investment += shares * value;
+    })
+    return investment;
+}
 
 
-module.exports = { addUser, getUserBalance, addStocktoUser, debitStock, getShares, debitBalance, creditBalance };
+
+module.exports = {
+    addUser,
+    getUserBalance,
+    addStocktoUser,
+    debitStock,
+    getShares,
+    debitBalance,
+    creditBalance,
+    getInvestment,
+    getPrices
+};
