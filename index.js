@@ -20,11 +20,11 @@ const userrouter = require('./src/routes/userrouter');
 const { iporouter } = require('./src/routes/iporouter');
 const traderouter = require('./src/routes/traderouter');
 const sharerouter = require('./src/routes/sharerouter');
-const { getSharePrice, getShare, getAllShares, getsharesinit, getShareSymbol } = require('./src/controllers/Share');
+const { getSharePrice, getShare, getAllShares, getsharesinit, getShareSymbol, getPrice, getShareWithSymbol } = require('./src/controllers/Share');
 const { buyOrder, sellOrder, newBuy, setstockmap } = require('./src/controllers/BuySell');
 const shareModel = require('./src/models/share');
 const userModel = require('./src/models/User');
-const { addUser, addStocktoUser, debitBalance, creditBalance, getInvestment, getPrices } = require('./src/controllers/User');
+const { addUser, addStocktoUser, debitBalance, creditBalance, getInvestment, getPrices, getUserBalance } = require('./src/controllers/User');
 const sharesrouter = require('./src/routes/sharesrouter');
 const signuprouter = require('./src/routes/signuprouter');
 const loginrouter = require('./src/routes/loginrouter');
@@ -101,15 +101,26 @@ io.on('connection', async (socket) => {
 
     socket.emit('circuit', circuit);
 
-    socket.on('buyOrder', (data) => {
-        buyOrder(data);
-        socket.emit('buysuccess');
+    socket.on('buyOrder', async (data) => {
+        const { added, increased, decreased, stock } = await buyOrder(data);
+        added == 1 ? socket.emit('buysuccess') : '';
+        console.log('inc', increased)
+        if (increased == 1) {
+            const data = await getShareWithSymbol(stock)
+            console.log(data)
+            io.emit('updatestock', data)
+        }
     })
 
-    socket.on('sellOrder', (data) => {
+    socket.on('sellOrder', async (data) => {
 
-        sellOrder(data);
-        socket.emit('sellsuccess');
+        const { added, increased, decreased, stock } = await sellOrder(data);
+        added == 1 ? socket.emit('sellsuccess') : '';
+        if (decreased == 1) {
+            getShareWithSymbol(stock).then((data) => {
+                socket.emit('updatestock', data)
+            })
+        }
     })
 
 
