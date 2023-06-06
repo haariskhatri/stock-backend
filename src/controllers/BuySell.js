@@ -3,7 +3,7 @@ const { tradeIdModel } = require("../models/counters")
 const { getShares, addStocktoUser, debitStock, getUserBalance, debitBalance, creditBalance } = require("./User")
 const { addTrade } = require("../models/trades")
 const { assert } = require('assert')
-const { getAllShares } = require("./Share")
+const { getAllShares, getShareSymbol } = require("./Share")
 const { log } = require("console")
 const sendMail = require("./Mail")
 
@@ -41,11 +41,16 @@ const incrementTradeId = async (previous) => {
 
 
 const stockMap = new Map();
-stockMap.set('ADA', [[], []]);
-stockMap.set('REL', [[], []]);
-stockMap.set('TATA', [[], []]);
 
 
+const setstockmap = async () => {
+    const symbols = await getShareSymbol();
+    await symbols.map(ele => {
+        stockMap.set(ele.shareSymbol, [[], []])
+    })
+    console.log(stockMap);
+    return 200;
+}
 
 // const buyOrder = (data) => {
 //     const { stockId } = data;
@@ -73,9 +78,10 @@ const buyOrder = async (data) => {
     const { stockId } = data;
     const stock = stockMap.get(stockId);
     stock[0].push(data);
-    await matchOrder(stockId);
+    const match = await matchOrder(stockId);
     console.log(stock);
     console.log(data);
+    return { 'added': 1, 'match': match }
 
 }
 
@@ -83,9 +89,9 @@ const sellOrder = async (data) => {
     const { stockId } = data;
     const stock = stockMap.get(stockId);
     stock[1].push(data);
-    await matchOrder(stockId);
+    const match = await matchOrder(stockId);
     console.log(log);
-
+    return { 'added': 1, 'match': match }
 }
 
 // const sellOrder = (data) => {
@@ -220,7 +226,7 @@ const matchOrder = async (stock) => {
 
                 if (await getUserBalance(buy.userId) < buy.shares * buy.price || buy.userId === sell.userId) {
                     console.log('Invalid');
-                    return;
+                    return 0;
                 }
 
                 else {
@@ -231,7 +237,7 @@ const matchOrder = async (stock) => {
                         if (buy.shares < sell.shares) {
 
                             if (await getShares(sell.userId, sell.stockId) < buy.shares) {
-                                return;
+                                return 0;
                             }
                             else {
 
@@ -244,13 +250,14 @@ const matchOrder = async (stock) => {
                                 sendMail(sell.userEmail, id, 'Sell', sell.stockId, sell.shares, 'credit', buy.shares * buy.price);
                                 sell.shares -= buy.shares;
                                 buyarr.splice(buyIndex, 1);
-                                break;
+                                return 200;
+
                             }
                         }
 
                         if (buy.shares === sell.shares) {
                             if (await getShares(sell.userId, sell.stock) < buy.shares) {
-                                return;
+                                return 0;
                             }
                             else {
                                 await debitStock(sell.userId, sell.stockId, buy.shares);
@@ -264,12 +271,12 @@ const matchOrder = async (stock) => {
                                 sendMail(sell.userEmail, id, 'Sell', sell.stockId, sell.shares, 'credit', sell.shares * sell.price);
                                 buyarr.splice(buyIndex, 1)
                                 sellarr.splice(i, 1);
-                                break;
+                                return 200;
                             }
                         }
 
                         if (buy.shares > sell.shares) {
-                            return;
+                            return 0;
                         }
 
                     }
@@ -330,6 +337,7 @@ module.exports = {
     buyOrder,
     sellOrder,
     matchOrder,
+    setstockmap
 
 
 }
