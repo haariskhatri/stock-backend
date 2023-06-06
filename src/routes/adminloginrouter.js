@@ -9,7 +9,6 @@ const { debitBalance, addStocktoUser } = require('../controllers/User');
 const shareModel = require('../models/share');
 const { addShare } = require('../controllers/Share');
 const app = express();
-const io = new Server( { cors: { origin: 'http://localhost:5173' } });
 
 
 app.use(express.json());
