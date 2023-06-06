@@ -7,6 +7,11 @@ userrouter.get('/getuserdetail', async (req, res) => {
 
 })
 
+userrouter.get('/getuserbalance', async (req, res) => {
+
+    res.json(await addUser.getUserBalance(req.session.userId));
+})
+
 userrouter.post('/addUser', async (req, res) => {
     const { userName, userFullname } = req.body;
 
