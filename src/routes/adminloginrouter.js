@@ -63,8 +63,9 @@ adminloginrouter.get('/allocation_slot/:componyId',async(req,res)=>{
   })
   
   await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
-  
-  res.json({success:true,message:"Slot Located"})
+  await ipoModel.findOneAndDelete({companyId:req.params.componyId})
+
+  res.json({success:true,message:"Slot Allocated"})
 })
 
 

@@ -64,7 +64,7 @@ iporouter.post('/iposub', isAuth, Authjwt, async (req, res) => {
     const customerid=req.session.userId;
     const ipo=new ipomapsModel({customerId:customerid,ipoId:ipo_id,slotAmount:0})
     await ipo.save()
-    res.json({success:true,message:"Subscribed Ipo"})
+    res.json({success:true,message:"Ipo Subscribe Successfully"})
 
 })
 
