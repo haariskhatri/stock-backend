@@ -39,6 +39,7 @@ sharerouter.get('/getshares', (req, res) => {
     })
 })
 
+
 sharerouter.get('/gettopshares', (req, res) => {
     getTopShares().then((data) => {
         res.json(data);

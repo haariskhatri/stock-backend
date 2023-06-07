@@ -25,12 +25,8 @@ const getPrice = async (symbol) => {
     return (await shareModel.findOne({ 'shareSymbol': symbol }).select({ 'sharePrice': 1 })).sharePrice;
 }
 
-const increasePrice = async (stock) => {
-    await shareModel.findOneAndUpdate({ 'shareSymbol': stock }, { '$inc': { 'sharePrice': 0.1 } })
-}
-
-const decreasePrice = async (stock) => {
-    await shareModel.findOneAndUpdate({ 'shareSymbol': stock }, { '$inc': { 'sharePrice': - 0.1 } })
+const changePrice = async (stock, price) => {
+    return await shareModel.findOneAndUpdate({ 'shareSymbol': stock }, { '$set': { 'sharePrice': price } });
 }
 
 
@@ -78,8 +74,7 @@ module.exports = {
     getsharesinit,
     getShareSymbol,
     getPrice,
-    increasePrice,
-    decreasePrice,
-    getShareWithSymbol
+    getShareWithSymbol,
+    changePrice
 
 }

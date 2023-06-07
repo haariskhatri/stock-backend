@@ -9,14 +9,14 @@ const UserSchema = mongoose.Schema(
         userName: {
             type: String,
             required: true
-        }, 
+        },
         email: {
             type: String,
             required: true
         },
-        password:{
-            type:String,
-            required:true
+        password: {
+            type: String,
+            required: true
         },
         userBalance: {
             type: Number,
@@ -32,6 +32,10 @@ const UserSchema = mongoose.Schema(
             required: true
         },
         userStatus: {
+            type: Number,
+            required: true
+        },
+        userInvested: {
             type: Number,
             required: true
         },

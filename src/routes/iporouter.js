@@ -1,7 +1,7 @@
 const express = require('express');
 const { ipoCounterModel } = require('../models/counters');
 const ipoModel = require('../models/ipo');
-const { getallIpo, getActiveIpos, getId } = require('../controllers/Ipo');
+const { getallIpo, getActiveIpos, getId, getIpo } = require('../controllers/Ipo');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie-parser');
 const ipomapsModel = require('../models/ipomaps');
@@ -42,8 +42,13 @@ iporouter.get('/getid', isAuth, Authjwt, async (req, res) => {
     res.json(await getId());
 })
 
-iporouter.get('/getallipos', isAuth, Authjwt, async (req, res) => {
+iporouter.get('/getallipos', async (req, res) => {
     res.json(await getallIpo());
+})
+
+iporouter.post('/checkipo', async (req, res) => {
+    const { name, stock } = req.body;
+    res.json(await getIpo(name, stock));
 })
 
 iporouter.get('/getactiveipos', isAuth, Authjwt, async (req, res) => {
@@ -61,10 +66,10 @@ iporouter.post('/getipo', async (req, res) => {
 iporouter.post('/iposub', isAuth, Authjwt, async (req, res) => {
     const { ipo_id } = req.body;
     console.log(ipo_id);
-    const customerid=req.session.userId;
-    const ipo=new ipomapsModel({customerId:customerid,ipoId:ipo_id,slotAmount:0})
+    const customerid = req.session.userId;
+    const ipo = new ipomapsModel({ customerId: customerid, ipoId: ipo_id, slotAmount: 0 })
     await ipo.save()
-    res.json({success:true,message:"Ipo Subscribe Successfully"})
+    res.json({ success: true, message: "Ipo Subscribe Successfully" })
 
 })
 
@@ -124,7 +129,7 @@ iporouter.post('/addipo', isAuth, Authjwt, async (req, res) => {
     console.log(updateid);
     console.log("Saved");
 
-    res.send(true)
+    res.json(true);
 
 })
 
