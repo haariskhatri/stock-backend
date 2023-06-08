@@ -57,7 +57,7 @@ iporouter.get('/getactiveipos', isAuth, Authjwt, async (req, res) => {
     res.json(await getActiveIpos());
 })
 
-iporouter.post('/getipo',isAuth, async (req, res) => {
+
 iporouter.post('/addslot', async (req, res) => {
     const { customerId, ipoId, slotAmount } = req.body;
     await addSlot(customerId, ipoId, slotAmount);
@@ -147,4 +147,4 @@ iporouter.post('/addipo', async (req, res) => {
 
 
 
-module.exports = { iporouter, isAuth, Authjwt };
+module.exports = { iporouter, isAuth, Authjwt }
