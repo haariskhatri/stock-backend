@@ -5,6 +5,8 @@ const { getallIpo, getActiveIpos, getId, getIpo } = require('../controllers/Ipo'
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie-parser');
 const ipomapsModel = require('../models/ipomaps');
+const { addSlot } = require('../controllers/Slot');
+const { addCompany } = require('../models/company');
 
 
 const iporouter = express.Router();
@@ -54,6 +56,14 @@ iporouter.post('/checkipo', async (req, res) => {
 iporouter.get('/getactiveipos', isAuth, Authjwt, async (req, res) => {
     res.json(await getActiveIpos());
 })
+
+iporouter.post('/addslot', async (req, res) => {
+    const { customerId, ipoId, slotAmount } = req.body;
+    await addSlot(customerId, ipoId, slotAmount);
+    res.json('done')
+})
+
+
 
 iporouter.post('/getipo', async (req, res) => {
     console.log(req.body);
@@ -123,6 +133,8 @@ iporouter.post('/addipo', async (req, res) => {
         companyEnddate: companyEnddate,
         companyDescription: companyDescription
     }).save();
+
+    await addCompany(companyId, companyName, companySymbol, 0);
 
     const updateid = await ipoCounterModel.findOneAndUpdate({ '$inc': { 'ipo_id': 1 } });
 
