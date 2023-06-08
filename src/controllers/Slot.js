@@ -1,6 +1,7 @@
 const ipoModel = require('../models/ipo');
-const slotModel = require('../models/slot')
+const { slotModel, slotIdModel } = require('../models/slot')
 const ipomapsModel = require('../models/ipomaps');
+const { getIpoById } = require('./Ipo');
 
 const getMaximumSlotsAllowed = async (ipo_id) => {
     return (await ipoModel.findOne({ companyId: ipo_id }).select({ _id: 0, companyMaximumSlotsAllowed: 1 })).companyMaximumSlotsAllowed;
@@ -16,13 +17,13 @@ const checkifUserExists = async (customerId, ipoId) => {
 
 //get all slots for ipo
 const getIpoSlots = async (id) => {
-    return await ipomapsModel.find({ 'ipoId': id });
+    return await slotModel.find({ 'ipoId': id });
 }
 
 //get total shares in ipo
 const getTotalSlots = async (id) => {
     const result = (await ipoModel.findOne({ 'companyId': id }))
-    return { 'shares': result.companyShares, 'price': result.companyValuepershare }
+    return result.companyShares;
 }
 
 //get subscribed shares
@@ -35,11 +36,13 @@ const getSubscribed = async (id) => {
     return subscribed;
 }
 
+
+
 const checkSubscription = async (id) => {
     const actual = await getTotalSlots(id);
     const subscribed = await getSubscribed(id);
 
-    if (subscribed === actual) {
+    if (subscribed === actual.ac) {
         return 'perfect';
     }
     else if (subscribed > actual) {
@@ -51,62 +54,67 @@ const checkSubscription = async (id) => {
 }
 
 
+const getslotId = async () => {
+    const result = await slotIdModel.find({});
+    return result[0].slot_id;
+}
+
+const incrementSlotId = async (id) => {
+    return await slotIdModel.updateOne({ 'slot_id': id }, { '$inc': { 'slot_id': 1 } })
+}
 
 
 const checkIfIpoExists = async (ipoId) => {
     return Boolean(await ipoModel.findOne({ companyId: ipoId }));
 }
 
-const addSlot = async (slotId, customerId, ipoId, slotAmount, slotNumber) => {
+const addSlot = async (customerId, ipoId, slotAmount) => {
 
 
+    const ipo = await getIpoById(ipoId);
 
-    const slotsAllowed = await getMaximumSlotsAllowed(ipoId);
-    const slotsOwned = await getSlotsFilledbyCustomer(customerId, ipoId);
-    const ipoExists = await checkIfIpoExists(ipoId);
 
-    if (!ipoExists) {
+    if (ipo === null) {
         return `ipo doesn't exist`;
     }
 
-    else if (slotsOwned + (slotAmount * slotNumber) >= slotsAllowed) {
-        return 'slot limit exceeded';
-    }
+    // else if (slotsOwned + (slotAmount * slotNumber) >= companyMaximumSlotsAllowed) {
+    //     return 'slot limit exceeded';
+    // }
 
     else {
-        const addslot = await slotModel({
-            slotId: slotId,
-            customerId: customerId,
-            ipoId: ipoId,
-            slotAmount: slotAmount,
-            slotNumber: slotNumber
-        }).save();
+        const userExists = await slotModel.findOne({ 'customerId': customerId, 'ipoId': ipoId });
 
-        const userExists = await checkifUserExists(customerId, ipoId);
-
-
-        if (userExists == false) {
-            const addnew = await ipomapsModel({
-                customerId: customerId,
-                ipoId: ipoId,
-                slotAmount: (slotAmount * slotNumber)
-            }).save();
-
-            return 'done';
-
+        if (userExists != null) { //this means user exists , if yes , then just add slot amount to user
+            if (userExists.slotAmount + slotAmount > ipo.companySlotSize * ipo.companyMaximumSlotsAllowed) {
+                return 'limit exceeded';
+            }
+            else {
+                await slotModel.findOneAndUpdate({ 'customerId': customerId, 'ipoId': ipoId }, { '$inc': { 'slotAmount': slotAmount } })
+                return 'added to existing';
+            }
         }
 
         else {
 
-            await ipomapsModel.findOneAndUpdate({
+
+            const slotid = await getslotId();
+
+            if (slotAmount > ipo.companySlotSize * ipo.companyMaximumSlotsAllowed) {
+                return 'greater than limit';
+            }
+
+            const addslot = await slotModel({
+                slotId: slotid,
                 customerId: customerId,
-                ipoId: ipoId
-            },
-                { '$inc': { 'slotAmount': slotAmount * slotNumber } }
-            )
-
-            return 'done';
-
+                ipoId: ipoId,
+                slotAmount: slotAmount,
+                slotSize: ipo.companySlotSize,
+                ipoPrice: ipo.companyValuepershare
+            }).save();
+            await incrementSlotId(slotid);
+            console.log('stockId', slotid)
+            return 'new slot added';
         }
     }
 }
