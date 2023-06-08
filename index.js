@@ -79,8 +79,6 @@ app.use('/public', express.static(path.join(__dirname, 'images')))
 const circuit = 15;
 
 
-
-
 io.on('connection', async (socket) => {
     console.log(socket.id)
 
