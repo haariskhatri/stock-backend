@@ -105,8 +105,15 @@ const creditBalance = async (userId, amount) => {
 }
 
 const getUserBalance = async (userId) => {
-    const result = await userModel.findOne({ 'userId': userId });
-    return result.userBalance;
+
+    if (!userId){
+        return 0;
+    }
+    else{
+
+        const result = await userModel.findOne({ 'userId': userId });
+        return result.userBalance;
+    }
 }
 
 const debitStock = async (userId, stock, shares) => {

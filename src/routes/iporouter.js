@@ -38,7 +38,7 @@ const Authjwt = (req, res, next) => {
     }
 }
 
-iporouter.get('/getid', isAuth, Authjwt, async (req, res) => {
+iporouter.get('/getid', async (req, res) => {
     res.json(await getId());
 })
 
@@ -55,7 +55,7 @@ iporouter.get('/getactiveipos', isAuth, Authjwt, async (req, res) => {
     res.json(await getActiveIpos());
 })
 
-iporouter.post('/getipo', async (req, res) => {
+iporouter.post('/getipo',isAuth, async (req, res) => {
     console.log(req.body);
     ipoModel.findOne({ 'companyId': req.body.companyId }).then((data) => {
         res.json(data)
@@ -81,7 +81,7 @@ iporouter.get('/singleipo/:componyid', isAuth, Authjwt, async (req, res) => {
 
 })
 
-iporouter.get('/getipo', isAuth, Authjwt, async (req, res) => {
+iporouter.get('/getipo', async (req, res) => {
     const ipo = await ipoModel.find();
     res.json({ success: true, ipo: ipo })
 })

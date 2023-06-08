@@ -43,19 +43,45 @@ const Authjwt = (req, res, next) => {
   }
 }
 
-adminloginrouter.get('/admincompony', isAuth, Authjwt, async (req, res) => {
-  const data = ipoModel.find();
+const checkadmin=(req,res,next)=>{
+  if(req.session.email == 'kishan.dave@minddeft.net')
+  {
+    next()
+  }else
+  {
+    res.json({ success: false, message: "Only Admin Can Access" })
+    
+  }
+}
 
+adminloginrouter.get('/admincompony',checkadmin, async (req, res) => {
+  const ipo = ipoModel.find();
+  res.json({success:true,ipo:ipo})
 })
 
-adminloginrouter.get('/cancelipo/:companyId', isAuth, Authjwt, async (req, res) => {
+
+adminloginrouter.get('/logout', async (req, res) => {
+  req.session.destroy();
+  res.json({ success: true, message: "You Are Loged Out" })
+})
+
+
+adminloginrouter.get('/cancelipo/:companyId',checkadmin, async (req, res) => {
   const data = ipoModel.findOneAndDelete({companyId:req.params.companyId});
   res.json({ success: true, message: "Ipo Canceled" })
 
 
 })
 
-adminloginrouter.get('/allocation_slot/:componyId', async (req, res) => {
+adminloginrouter.get('/checkadmin',checkadmin, async (req, res) => {
+  
+  res.json({ success: true, message: "Admin" })
+
+})
+
+
+
+adminloginrouter.get('/allocation_slot/:componyId',checkadmin, async (req, res) => {
 
 
   const componyId = req.params.componyId

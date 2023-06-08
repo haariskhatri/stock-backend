@@ -62,6 +62,24 @@ loginrouter.get('/checksession',(req,res)=>{
   {
     res.json({success:true})
   }
+  else
+  {
+    res.json({success:false})
+
+  }
+})
+
+loginrouter.post('/adminlogin',(req,res)=>{
+  const {email,password}=req.body;
+  if(email=="kishan.dave@minddeft.net" && password=="1234")
+  {
+    req.session.email=email;
+    req.session.userId=13;
+    res.json({success:true})
+  }else{
+    res.json({success:false})
+
+  }
 })
 
 
