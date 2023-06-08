@@ -6,11 +6,11 @@ const slotSchema = mongoose.Schema(
             type: Number,
             required: true
         },
-        customerId: {
+        ipoId: {
             type: Number,
             required: true
         },
-        ipoId: {
+        customerId: {
             type: Number,
             required: true
         },
@@ -18,7 +18,11 @@ const slotSchema = mongoose.Schema(
             type: Number,
             required: true
         },
-        slotNumber: {
+        slotSize: {
+            type: Number,
+            required: true
+        },
+        ipoPrice: {
             type: Number,
             required: true
         }
@@ -26,7 +30,18 @@ const slotSchema = mongoose.Schema(
     }
 )
 
+const slotIdSchema = mongoose.Schema(
+    {
+        slot_id: {
+            type: Number,
+            required: true
+        }
+    }
+)
+
+const slotIdModel = mongoose.model('slotids', slotIdSchema);
+
 const slotModel = mongoose.model('slots', slotSchema);
 
 
-module.exports = slotModel;
+module.exports = { slotModel, slotIdModel };
