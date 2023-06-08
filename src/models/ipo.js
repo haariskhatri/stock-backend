@@ -12,6 +12,10 @@ const ipoSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    companyCategory: {
+        type: String,
+        required: true
+    },
     companyLogo: {
         data: Buffer,
         contentType: String
@@ -30,11 +34,7 @@ const ipoSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    companyMinimumSlotSize: {
-        type: Number,
-        required: true
-    },
-    companyMaximumSlotSize: {
+    companySlotSize: {
         type: Number,
         required: true
     },

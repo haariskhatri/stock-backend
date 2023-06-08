@@ -9,6 +9,12 @@ const getId = async () => {
     return id[0].ipo_id;
 }
 
+const getIpoById = async (id) => {
+    return await ipoModel.findOne({ 'companyId': id });
+}
+
+
+
 const incrementId = async (present_value) => {
     await ipoCounterModel.findOneAndUpdate({ 'ipo_id': present_value }, { '$inc': { 'ipo_id': 1 } });
     return 200;
@@ -18,6 +24,15 @@ const getallIpo = async () => {
     const ipos = await ipoModel.find({});
     return ipos;
 }
+
+const getIpo = async (name, stock) => {
+    const cname = Boolean(await ipoModel.findOne({ 'companyName': name }))
+    const symbol = Boolean(await ipoModel.findOne({ 'companySymbol': stock }))
+
+    return (cname && symbol);
+}
+
+
 
 const getActiveIpos = async () => {
     const date = normalizeDate(new Date());

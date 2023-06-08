@@ -33,12 +33,26 @@ const getUserId = async () => {
     return result[0].user_id;
 }
 
+const getusershare = async (userId, stock) => {
+    const result = (await userModel.findOne({ 'userId': userId }).select({ 'userPortfolio': 1 }));
+    const balance = result.userPortfolio.get(stock);
+
+    if (balance === undefined) {
+        return 0;
+    }
+    else {
+        return balance;
+    }
+}
+
+
+
 const addUser = async (
     userName,
     email,
     passwordHash,
-
 ) => {
+
     const userId = await getUserId();
 
     const newuser = userModel({
@@ -50,34 +64,37 @@ const addUser = async (
         userOrders: [],
         userPortfolio: [],
         userStatus: 0,
+        userInvested: 0,
         created: (new Date().getFullYear() + '-' + new Date().getMonth() + '-' + new Date().getDate())
     })
 
     const added = newuser.save().then((user) => {
-        return 200;
+        return userId;
     }).catch((error) => {
         return 400;
     })
 
 
-    const incrementId = userIdModel.findOneAndUpdate({ user_id: userId }, { '$inc': { 'user_id': 1 } });
-    const incremented = incrementId.exec().then((incremented) => {
-        return 200;
-    })
-        .catch((err) => {
-            return 400;
-        })
+    const incrementId = await userIdModel.findOneAndUpdate({ 'user_id': userId }, { '$inc': { 'user_id': 1 } });
 
-    return incremented && added;
 
+    return newuser.userId;
 
 }
 
+const addinvestment = async (userId, amount) => {
+    await userModel.findOneAndUpdate({ 'userId': userId }, { '$inc': { 'userInvested': amount } })
+}
+
+const debitinvestment = async (userId, amount) => {
+    await userModel.findOneAndUpdate({ 'userId': userId }, { '$inc': { 'userInvested': - amount } })
+}
 
 const addStocktoUser = async (userId, stock, shares) => {
-    const addstock = await userModel.updateOne({ 'userId': userId }, { '$inc': { [`userPortfolio.${stock}`]: parseInt(shares) } })
+    const addstock = await userModel.findOneAndUpdate({ 'userId': userId }, { '$inc': { [`userPortfolio.${stock}`]: parseInt(shares) } })
     return 200;
 }
+
 
 const debitBalance = async (userId, amount) => {
     await userModel.updateOne({ 'userId': userId }, { '$inc': { 'userBalance': - amount } })
@@ -140,5 +157,6 @@ module.exports = {
     debitBalance,
     creditBalance,
     getInvestment,
-    getPrices
+    getPrices,
+    getusershare
 };

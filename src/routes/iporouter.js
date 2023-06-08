@@ -1,7 +1,7 @@
 const express = require('express');
 const { ipoCounterModel } = require('../models/counters');
 const ipoModel = require('../models/ipo');
-const { getallIpo, getActiveIpos, getId,Subscribeipo } = require('../controllers/Ipo');
+const { getallIpo, getActiveIpos, getId, getIpo,Subscribeipo } = require('../controllers/Ipo');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie-parser');
 const ipomapsModel = require('../models/ipomaps');
@@ -46,6 +46,11 @@ iporouter.get('/getallipos', async (req, res) => {
     res.json(await getallIpo());
 })
 
+iporouter.post('/checkipo', async (req, res) => {
+    const { name, stock } = req.body;
+    res.json(await getIpo(name, stock));
+})
+
 iporouter.get('/getactiveipos', isAuth, Authjwt, async (req, res) => {
     res.json(await getActiveIpos());
 })
@@ -81,18 +86,17 @@ iporouter.get('/getipo', isAuth, Authjwt, async (req, res) => {
     res.json({ success: true, ipo: ipo })
 })
 
-
-iporouter.post('/addipo', isAuth, Authjwt, async (req, res) => {
+iporouter.post('/addipo', async (req, res) => {
 
     const {
         companyId,
         companyName,
         companySymbol,
+        companyCategory,
         companyLogo,
         companyShares,
         companyValuepershare,
-        companyMinimumSlotSize,
-        companyMaximumSlotSize,
+        companySlotSize,
         companyMaximumSlotsAllowed,
         companyValuation,
         companyStartdate,
@@ -100,8 +104,7 @@ iporouter.post('/addipo', isAuth, Authjwt, async (req, res) => {
         companyDescription
     } = req.body;
 
-    console.log(req.body)
-    console.log(companyMaximumSlotsAllowed);
+
 
 
 
@@ -109,11 +112,11 @@ iporouter.post('/addipo', isAuth, Authjwt, async (req, res) => {
         companyId: companyId,
         companyName: companyName,
         companySymbol: companySymbol,
+        companyCategory: companyCategory,
         companyLogo: companyLogo,
         companyShares: companyShares,
         companyValuepershare: companyValuepershare,
-        companyMinimumSlotSize: companyMinimumSlotSize,
-        companyMaximumSlotSize: companyMinimumSlotSize,
+        companySlotSize: companySlotSize,
         companyMaximumSlotsAllowed: companyMaximumSlotsAllowed,
         companyValuation: companyShares * companyValuepershare,
         companyStartdate: companyStartdate,
@@ -122,10 +125,10 @@ iporouter.post('/addipo', isAuth, Authjwt, async (req, res) => {
     }).save();
 
     const updateid = await ipoCounterModel.findOneAndUpdate({ '$inc': { 'ipo_id': 1 } });
-    console.log(updateid);
+
     console.log("Saved");
 
-    res.send(true)
+    res.json(true);
 
 })
 

@@ -21,6 +21,14 @@ const getsharesinit = async () => {
     return allstocks;
 }
 
+const getPrice = async (symbol) => {
+    return (await shareModel.findOne({ 'shareSymbol': symbol }).select({ 'sharePrice': 1 })).sharePrice;
+}
+
+const changePrice = async (stock, price) => {
+    return await shareModel.findOneAndUpdate({ 'shareSymbol': stock }, { '$set': { 'sharePrice': price } });
+}
+
 
 const addShare = async (shareName, shareSymbol, sharePrice, shareQty, description, category) => {
 
@@ -41,6 +49,8 @@ const addShare = async (shareName, shareSymbol, sharePrice, shareQty, descriptio
     return 200;
 }
 
+
+
 const getTopShares = async () => {
     return await shareModel.find({}).sort({ sharePrice: 'desc' });
 }
@@ -48,6 +58,11 @@ const getTopShares = async () => {
 const getShare = (shareId) => {
     return shareModel.findOne({ 'shareId': shareId });
 }
+
+const getShareWithSymbol = async (stock) => {
+    return await shareModel.findOne({ 'shareSymbol': stock });
+}
+
 
 module.exports = {
     getSharePrice,
@@ -57,6 +72,9 @@ module.exports = {
     getShare,
     getAllShares,
     getsharesinit,
-    getShareSymbol
+    getShareSymbol,
+    getPrice,
+    getShareWithSymbol,
+    changePrice
 
 }
