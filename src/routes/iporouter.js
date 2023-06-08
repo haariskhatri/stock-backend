@@ -1,7 +1,7 @@
 const express = require('express');
 const { ipoCounterModel } = require('../models/counters');
 const ipoModel = require('../models/ipo');
-const { getallIpo, getActiveIpos, getId } = require('../controllers/Ipo');
+const { getallIpo, getActiveIpos, getId,Subscribeipo } = require('../controllers/Ipo');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie-parser');
 const ipomapsModel = require('../models/ipomaps');
@@ -42,7 +42,7 @@ iporouter.get('/getid', isAuth, Authjwt, async (req, res) => {
     res.json(await getId());
 })
 
-iporouter.get('/getallipos', isAuth, Authjwt, async (req, res) => {
+iporouter.get('/getallipos', async (req, res) => {
     res.json(await getallIpo());
 })
 
@@ -60,10 +60,10 @@ iporouter.post('/getipo', async (req, res) => {
 
 iporouter.post('/iposub', isAuth, Authjwt, async (req, res) => {
     const { ipo_id } = req.body;
-    console.log(ipo_id);
     const customerid=req.session.userId;
-    const ipo=new ipomapsModel({customerId:customerid,ipoId:ipo_id,slotAmount:0})
-    await ipo.save()
+    console.log("Ipo is: ",ipo_id);
+    const amount=await ipoModel.findOne({companyId:ipo_id});
+    await Subscribeipo(customerid,ipo_id,amount.companyMinimumSlotSize)
     res.json({success:true,message:"Ipo Subscribe Successfully"})
 
 })
@@ -80,6 +80,7 @@ iporouter.get('/getipo', isAuth, Authjwt, async (req, res) => {
     const ipo = await ipoModel.find();
     res.json({ success: true, ipo: ipo })
 })
+
 
 iporouter.post('/addipo', isAuth, Authjwt, async (req, res) => {
 
