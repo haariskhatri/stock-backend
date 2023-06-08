@@ -74,4 +74,4 @@ const addTrade = async (
 }
 
 
-module.exports = { addTrade, getTradeId, incrementTradeId };
+module.exports = { addTrade, getTradeId, incrementTradeId, tradeModel };
