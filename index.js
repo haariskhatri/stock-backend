@@ -32,7 +32,7 @@ const adminloginrouter = require('./src/routes/adminloginrouter');
 const path = require('path');
 const { log } = require('console');
 const { getIpoSlots, getTotalSlots, getSubscribed, checkSubscription } = require('./src/controllers/Slot');
-const allocateIpo = require('./src/controllers/AllocateSlot');
+
 
 
 
@@ -173,7 +173,6 @@ server.listen(4000, async () => {
     console.log("Listening");
     mongoose.connect('mongodb+srv://root:Haaris8785@cluster0.walzl.mongodb.net/stock')
     await setstockmap();
-    console.log(match3('REL'));
     console.log("Mongoose Connected");
 })
 
