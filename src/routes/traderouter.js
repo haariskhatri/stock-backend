@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const tradeModel = require('../models/trades');
+const { tradeModel } = require("../models/trades");
 
 const traderouter = Router();
 
@@ -15,7 +15,8 @@ traderouter.get('/sellhistory', async (req, res) => {
 })
 
 // const check=async(userId)=>{
-//       const userhistory = await tradeModel.find({$or:[{ buyerId:userId },{sellerId:userId}]}).sort({date:-1});
+      
+//       const userhistory = await tradeModel.find()
 //       return userhistory
 // }
 
