@@ -40,7 +40,7 @@ const Authjwt = (req, res, next) => {
     }
 }
 
-iporouter.get('/getid', isAuth, Authjwt, async (req, res) => {
+iporouter.get('/getid', async (req, res) => {
     res.json(await getId());
 })
 
@@ -56,6 +56,7 @@ iporouter.post('/checkipo', async (req, res) => {
 iporouter.get('/getactiveipos', isAuth, Authjwt, async (req, res) => {
     res.json(await getActiveIpos());
 })
+
 
 iporouter.post('/addslot', async (req, res) => {
     const { customerId, ipoId, slotAmount } = req.body;
@@ -74,12 +75,16 @@ iporouter.post('/getipo', async (req, res) => {
 
 
 iporouter.post('/iposub', isAuth, Authjwt, async (req, res) => {
-    const { ipo_id } = req.body;
-    const customerid=req.session.userId;
-    console.log("Ipo is: ",ipo_id);
-    const amount=await ipoModel.findOne({companyId:ipo_id});
-    await Subscribeipo(customerid,ipo_id,amount.companyMinimumSlotSize)
-    res.json({success:true,message:"Ipo Subscribe Successfully"})
+     const { ipo_id,minimumslot } = req.body;
+     const customerId=req.session.userId;
+     
+      addSlot(customerId, ipo_id, minimumslot)
+    // const customerid=req.session.userId;
+    // console.log("Ipo is: ",ipo_id);
+    // const amount=await ipoModel.findOne({companyId:ipo_id});
+    // await Subscribeipo(customerid,ipo_id,amount.companyMinimumSlotSize)
+    // res.json({success:true,message:"Ipo Subscribe Successfully"})
+
 
 })
 
@@ -91,7 +96,7 @@ iporouter.get('/singleipo/:componyid', isAuth, Authjwt, async (req, res) => {
 
 })
 
-iporouter.get('/getipo', isAuth, Authjwt, async (req, res) => {
+iporouter.get('/getipo', async (req, res) => {
     const ipo = await ipoModel.find();
     res.json({ success: true, ipo: ipo })
 })
@@ -146,4 +151,4 @@ iporouter.post('/addipo', async (req, res) => {
 
 
 
-module.exports = { iporouter, isAuth, Authjwt };
+module.exports = { iporouter, isAuth, Authjwt }
