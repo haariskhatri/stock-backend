@@ -21,7 +21,7 @@ const { iporouter } = require('./src/routes/iporouter');
 const traderouter = require('./src/routes/traderouter');
 const sharerouter = require('./src/routes/sharerouter');
 const { getSharePrice, getShare, getAllShares, getsharesinit, getShareSymbol, getPrice, getShareWithSymbol } = require('./src/controllers/Share');
-const { buyOrder, sellOrder, newBuy, setstockmap, getStockMap } = require('./src/controllers/BuySell');
+const { buyOrder, sellOrder, newBuy, setstockmap, getStockMap, match3 } = require('./src/controllers/BuySell');
 const shareModel = require('./src/models/share');
 const userModel = require('./src/models/User');
 const { addUser, addStocktoUser, debitBalance, creditBalance, getInvestment, getPrices, getUserBalance } = require('./src/controllers/User');
@@ -173,6 +173,7 @@ server.listen(4000, async () => {
     console.log("Listening");
     mongoose.connect('mongodb+srv://root:Haaris8785@cluster0.walzl.mongodb.net/stock')
     await setstockmap();
+    console.log(match3('REL'));
     console.log("Mongoose Connected");
 })
 
