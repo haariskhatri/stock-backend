@@ -82,137 +82,140 @@ adminloginrouter.get('/checkadmin',checkadmin, async (req, res) => {
 
 
 
-// adminloginrouter.get('/allocation_slot/:componyId',checkadmin, async (req, res) => {
+adminloginrouter.get('/allocation_slot/:componyId',checkadmin, async (req, res) => {
 
 
-//   const componyId = req.params.componyId
-//   var users = await ipomapsModel.find({ ipoId: componyId })
-//   const ipos = await ipoModel.findOne({ companyId: componyId })
-//   var companyShares = ipos.companyShares;
-//   var minimumshare = ipos.companyMinimumSlotSize;
-//   var valuepershare = ipos.companyValuepershare;
+  const componyId = req.params.componyId
+  var users = await ipomapsModel.find({ ipoId: componyId })
+  const ipos = await ipoModel.findOne({ companyId: componyId })
+  var companyShares = ipos.companyShares;
+  var minimumshare = ipos.companySlotSize;
+  var valuepershare = ipos.companyValuepershare;
 
-//   const slot = companyShares / minimumshare;//20
+  const slot = companyShares / minimumshare;//20
 
-//   var sum = 0;
-//   users.map(ele => {
-//     sum += ele.slotAmount;
-//   })
+  var sum = 0;
+  users.map(ele => {
+    sum += ele.slotAmount;
+  })
 
-//   console.log(sum / minimumshare);
+  console.log(sum / minimumshare);
 
 
-//   if ((sum / minimumshare) < slot) {
+  if ((sum / minimumshare) < slot) {
 
-//     console.log("Under Subscriber");
-//     users.map(async (u) => {
-//       const balance = u.slotAmount * valuepershare
-//       await debitBalance(u.customerId, balance)
-//       await addStocktoUser(u.customerId, ipos.companySymbol, u.slotAmount)
-//       await decreaseIpo(componyId, u.slotAmount)
-//     })
+    console.log("Under Subscriber");
+    users.map(async (u) => {
+      const balance = u.slotAmount * valuepershare
+      await debitBalance(u.customerId, balance)
+      await addStocktoUser(u.customerId, ipos.companySymbol, u.slotAmount)
+      await decreaseIpo(componyId, u.slotAmount)
+    })
 
-//     await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
-//     await ipoModel.findOneAndDelete({ companyId: req.params.componyId })
+    await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
+    await ipoModel.findOneAndDelete({ companyId: req.params.componyId })
 
-//   } else {
+  } else {
 
-//     var count = ipos.companyShares;//20
-//     console.log("Over Subscriber");
-//     while (count > 0) {
-//       console.log(count); // Print count
+    var count = ipos.companyShares;//20
+    console.log("Over Subscriber");
+    while (count > 0) {
+      console.log(count); 
     
-//       // Fetch users data only if count is greater than zero
-//       if (count > 0) {
-//         console.log("enter counter");
-//         await getIpoUser(componyId).then(async (data) => {
-//           const users = data;
+      if (count > 0) {
+        console.log("enter counter");
+        await getIpoUser(componyId).then(async (data) => {
+          const users = data;
     
-//           if (users.length > 0) {
-//             // Process users data
-//             for (const u of users) {
-//               console.log("after");
-//               console.log("User", users);
-//               console.log("Under Map");
-//               const balance = minimumshare * valuepershare;
-            
+          if (users.length > 0) {
+            // Process users data
+            for (const u of users) {
+              if(count>0)
+              {
 
-//                   await debitBalance(u.customerId, balance);
-//                   await addStocktoUser(u.customerId, ipos.companySymbol, minimumshare);
-//                   await decreaseSlot(u.customerId, componyId, minimumshare);
-//                   await decreaseIpo(componyId, minimumshare)
-    
-        
-//                   console.log("Company Function");
-//                   count -= minimumshare;
-//                   console.log("Map In: " + count);
-                
-//             }
-//             return;
-//           } else {
-//             // No more users available, exit the loop
-//             count = 0;
-//           }
-//         });
-//       }
-//     }
-//     // while (count > 0) {
-//     //   console.log(count);//30
-//     //   await getIpoUser(componyId).then((data) => {
-//     //     users = data
-//     //   }).then(async()=>{
-//     //     for (const u of users) {
-//     //       console.log("after");
-//     //       console.log("User", users);
-//     //       console.log("Under Map");
-//     //       const balance = minimumshare * valuepershare;
-
-//     //       await debitBalance(u.customerId, balance);
-//     //       await addStocktoUser(u.customerId, ipos.companySymbol, minimumshare);
-//     //       await decreaseSlot(u.customerId, componyId, minimumshare);
-
-//     //       console.log("Company Function");
-//     //       count -= minimumshare;
-//     //       console.log("Map In: " + count);
-//     //     }
-//         // users.map(async (u) => {
-//         //     if (count > 0) {
-//         //     console.log("after");
-//         //     console.log("User", users);
-            
-//         //     console.log("Under Map");
-//         //     const balance = minimumshare * valuepershare
-            
-//         //     debitBalance(u.customerId, balance).then(() => {
-
-//         //       addStocktoUser(u.customerId, ipos.companySymbol, minimumshare).then(() => {
-                
-//         //         decreaseSlot(u.customerId,componyId,minimumshare).then((data) => {
-//         //           console.log("Compny Function");
-//         //           count -= minimumshare;
-//         //           console.log("Map In: " + count);
-//         //       })
-//         //     })
-//         //   })
-//         //   // await decreaseIpo(componyId, minimumshare)
-          
-//         // }
-//         // })
-//     //})
-//       //}
-
-//     console.log("exit while");
-//     await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
-//     await ipoModel.findOneAndDelete({ companyId: req.params.componyId })
-
-//   }
-//   res.json({ success: true, message: "Slot Allocated" })
-// })
-adminloginrouter.get('/allocation_slot/:componyId',checkadmin,async(req,res)=>{
-  const ipo_id=req.params.componyId;
-  allocateIpo(ipo_id);
+                console.log("after");
+                console.log("User", users);
+                console.log("Under Map");
+                const balance = minimumshare * valuepershare;
+              
   
+                    await debitBalance(u.customerId, balance);
+                    await addStocktoUser(u.customerId, ipos.companySymbol, minimumshare);
+                    await decreaseSlot(u.customerId, componyId, minimumshare);
+                    await decreaseIpo(componyId, minimumshare)
+      
+          
+                    console.log("Company Function");
+                    count -= minimumshare;
+                    console.log("Map In: " + count);
+              }
+                
+            }
+            return;
+          } else {
+          
+            count = 0;
+          }
+        });
+      }
+    }
+    // while (count > 0) {
+    //   console.log(count);//30
+    //   await getIpoUser(componyId).then((data) => {
+    //     users = data
+    //   }).then(async()=>{
+    //     for (const u of users) {
+    //       console.log("after");
+    //       console.log("User", users);
+    //       console.log("Under Map");
+    //       const balance = minimumshare * valuepershare;
+
+    //       await debitBalance(u.customerId, balance);
+    //       await addStocktoUser(u.customerId, ipos.companySymbol, minimumshare);
+    //       await decreaseSlot(u.customerId, componyId, minimumshare);
+
+    //       console.log("Company Function");
+    //       count -= minimumshare;
+    //       console.log("Map In: " + count);
+    //     }
+        // users.map(async (u) => {
+        //     if (count > 0) {
+        //     console.log("after");
+        //     console.log("User", users);
+            
+        //     console.log("Under Map");
+        //     const balance = minimumshare * valuepershare
+            
+        //     debitBalance(u.customerId, balance).then(() => {
+
+        //       addStocktoUser(u.customerId, ipos.companySymbol, minimumshare).then(() => {
+                
+        //         decreaseSlot(u.customerId,componyId,minimumshare).then((data) => {
+        //           console.log("Compny Function");
+        //           count -= minimumshare;
+        //           console.log("Map In: " + count);
+        //       })
+        //     })
+        //   })
+        //   // await decreaseIpo(componyId, minimumshare)
+          
+        // }
+        // })
+    //})
+      //}
+
+    console.log("exit while");
+    await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
+    await ipoModel.findOneAndDelete({ companyId: req.params.componyId })
+
+  }
+  res.json({ success: true, message: "Slot Allocated" })
 })
+// adminloginrouter.get('/allocation_slot/:componyId',checkadmin,async(req,res)=>{
+//   const ipo_id=req.params.componyId;
+//   const result=await allocateIpo(ipo_id);
+//   res.json({message:result})
+// })
 
 
 module.exports = adminloginrouter;
