@@ -141,8 +141,8 @@ adminloginrouter.get('/allocation_slot/:componyId',checkadmin, async (req, res) 
   
                     await debitBalance(u.customerId, balance);
                     await addStocktoUser(u.customerId, ipos.companySymbol, minimumshare);
-                    await decreaseSlot(u.customerId, componyId, minimumshare);
-                    await decreaseIpo(componyId, minimumshare)
+                    //await decreaseSlot(u.customerId, componyId, minimumshare);
+                    //await decreaseIpo(componyId, minimumshare)
       
           
                     console.log("Company Function");
@@ -151,7 +151,7 @@ adminloginrouter.get('/allocation_slot/:componyId',checkadmin, async (req, res) 
               }
                 
             }
-            return;
+            
           } else {
           
             count = 0;

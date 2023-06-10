@@ -42,18 +42,18 @@ const getActiveIpos = async () => {
 }
 
 const Subscribeipo=async(customerId,ipoId,amount)=>{
-    const checkUserExists=await ipomapsModel.find({customerId:customerId,ipoId:ipoId})
-    console.log(checkUserExists);
-    if(checkUserExists.length !== 0)
-    {
-        await ipomapsModel.findOneAndUpdate({customerId:customerId,ipoId:ipoId}, {'$inc' : {'slotAmount': amount}})
-        return 200;
-    }else{
+    // const checkUserExists=await ipomapsModel.find({customerId:customerId,ipoId:ipoId})
+    
+    // if(checkUserExists.length !== 0)
+    // {
+    //     await ipomapsModel.findOneAndUpdate({customerId:customerId,ipoId:ipoId}, {'$inc' : {'slotAmount': amount}})
+    //     return 200;
+    // }else{
         const ipo= new ipomapsModel({customerId:customerId,ipoId:ipoId,slotAmount:amount})
         await ipo.save();
         return 200;
         
-    }
+    // }
 }
 
 const decreaseIpo=async(companyId,amount)=>{
