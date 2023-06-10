@@ -97,7 +97,7 @@ const allocateIpo = async (id) => {
                 if (user.slotAmount > 0) {
                     console.log('continue')
                     // continue;
-                    
+
                     if (shares == 0) {
                         await creditCompany(ipo.companyId, ipo.companyShares * ipo.companyValuepershare)
                         console.log('else if')
@@ -106,13 +106,13 @@ const allocateIpo = async (id) => {
                         return 'over allocated';
                     }
                     else {
-                        
+
                         console.log('else')
                         await debitBalance(user.customerId, ipoPrice * slotSize);
                         await addStocktoUser(user.customerId, ipo.companySymbol, slotSize);
                         user.slotAmount -= slotSize;
                         shares -= slotSize;
-                        console.log('inelse',shares)
+                        console.log('inelse', shares)
                     }
                 } else {
                     console.log('first `qehasd')
@@ -120,7 +120,7 @@ const allocateIpo = async (id) => {
                     break;
                 }
             }
-            if(breakFlag == 1) {
+            if (breakFlag == 1) {
                 break;
             }
             console.log("for");

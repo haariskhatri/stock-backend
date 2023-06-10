@@ -22,9 +22,19 @@ const getIpoSlots = async (id) => {
 
 //get total shares in ipo
 const getTotalSlots = async (id) => {
-    const result = (await ipoModel.findOne({ 'companyId': id }))
-    return result.companyShares;
+
+    if (id === null) {
+        return 0;
+    }
+    else {
+        const result = (await ipoModel.findOne({ 'companyId': id }))
+        return result.companyShares;
+
+    }
+
 }
+
+
 
 //get subscribed shares
 const getSubscribed = async (id) => {
