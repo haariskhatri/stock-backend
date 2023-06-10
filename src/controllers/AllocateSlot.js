@@ -68,7 +68,7 @@ const allocateIpo = async (id) => {
     if (status == 'under' || status == 'perfect') {
         var balance = 0;
 
-        //check if user has balance or take them out
+
 
         await filteredusers.forEach(async (user) => {
             balance += (user.slotAmount * ipo.companyValuepershare)
@@ -90,30 +90,44 @@ const allocateIpo = async (id) => {
 
 
 
+        let breakFlag = 0;
         while (shares > 0) {
             for (const user of filteredusers) {
-                if (user.slotAmount === 0) {
-                    continue;
-                }
-
-                else if (shares == 0) {
-                    await creditCompany(ipo.companyId, ipo.companyShares * ipo.companyValuepershare)
-                    await addIpotoMarket(ipo.companyId);
-                    await stopIpo(ipo.companyId);
-                    return 'over allocated';
-                }
-                else {
-
-                    await debitBalance(user.customerId, ipoPrice * slotSize);
-                    await addStocktoUser(user.customerId, ipo.companySymbol, slotSize);
-                    user.slotAmount -= slotSize;
-                    shares -= slotSize;
+                console.log('in for', user)
+                if (user.slotAmount > 0) {
+                    console.log('continue')
+                    // continue;
+                    
+                    if (shares == 0) {
+                        await creditCompany(ipo.companyId, ipo.companyShares * ipo.companyValuepershare)
+                        console.log('else if')
+                        await addIpotoMarket(ipo.companyId);
+                        await stopIpo(ipo.companyId);
+                        return 'over allocated';
+                    }
+                    else {
+                        
+                        console.log('else')
+                        await debitBalance(user.customerId, ipoPrice * slotSize);
+                        await addStocktoUser(user.customerId, ipo.companySymbol, slotSize);
+                        user.slotAmount -= slotSize;
+                        shares -= slotSize;
+                        console.log('inelse',shares)
+                    }
+                } else {
+                    console.log('first `qehasd')
+                    breakFlag = 1;
+                    break;
                 }
             }
+            if(breakFlag == 1) {
+                break;
+            }
+            console.log("for");
         }
-
     }
-
+    console.log('hile ended')
+    return 'done';
 }
 
 
