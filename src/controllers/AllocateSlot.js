@@ -100,7 +100,7 @@ const allocateIpo = async (id) => {
                     await creditCompany(ipo.companyId, ipo.companyShares * ipo.companyValuepershare)
                     await addIpotoMarket(ipo.companyId);
                     await stopIpo(ipo.companyId);
-                    return 'over allocated';
+                    break;
                 }
                 else {
 
