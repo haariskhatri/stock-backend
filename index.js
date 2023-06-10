@@ -21,7 +21,7 @@ const { iporouter } = require('./src/routes/iporouter');
 const traderouter = require('./src/routes/traderouter');
 const sharerouter = require('./src/routes/sharerouter');
 const { getSharePrice, getShare, getAllShares, getsharesinit, getShareSymbol, getPrice, getShareWithSymbol } = require('./src/controllers/Share');
-const { buyOrder, sellOrder, newBuy, setstockmap, getStockMap } = require('./src/controllers/BuySell');
+const { buyOrder, sellOrder, newBuy, setstockmap, getStockMap, match3 } = require('./src/controllers/BuySell');
 const shareModel = require('./src/models/share');
 const userModel = require('./src/models/User');
 const { addUser, addStocktoUser, debitBalance, creditBalance, getInvestment, getPrices, getUserBalance } = require('./src/controllers/User');
@@ -32,7 +32,7 @@ const adminloginrouter = require('./src/routes/adminloginrouter');
 const path = require('path');
 const { log } = require('console');
 const { getIpoSlots, getTotalSlots, getSubscribed, checkSubscription } = require('./src/controllers/Slot');
-const allocateIpo = require('./src/controllers/AllocateSlot');
+
 
 
 
