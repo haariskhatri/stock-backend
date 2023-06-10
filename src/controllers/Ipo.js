@@ -87,6 +87,6 @@ const getcomponyshare=(companyId)=>{
 
 
 
-module.exports = { getId, getallIpo, getActiveIpos, incrementId,Subscribeipo,decreaseIpo,getIpoUser,decreaseSlot,checkiposlot,getcomponyshare }
+module.exports = { getId, getallIpo, getActiveIpos, incrementId,Subscribeipo,decreaseIpo,getIpoUser,decreaseSlot,checkiposlot,getcomponyshare,getIpo,getIpoById }
 
 
