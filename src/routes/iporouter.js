@@ -78,13 +78,13 @@ iporouter.post('/iposub', isAuth, Authjwt, async (req, res) => {
      const { ipo_id,minimumslot } = req.body;
      const customerId=req.session.userId;
      
-      addSlot(customerId, ipo_id, minimumslot)
-    // const customerid=req.session.userId;
-    // console.log("Ipo is: ",ipo_id);
-    // const amount=await ipoModel.findOne({companyId:ipo_id});
-    // await Subscribeipo(customerid,ipo_id,amount.companyMinimumSlotSize)
-    // res.json({success:true,message:"Ipo Subscribe Successfully"})
-
+    //   const ans=await addSlot(customerId, ipo_id, minimumslot)
+    //   console.log(ans);
+    const customerid=req.session.userId;
+    console.log("Ipo is: ",ipo_id);
+    const amount=await ipoModel.findOne({companyId:ipo_id});
+    await Subscribeipo(customerid,ipo_id,amount.companySlotSize)
+     res.json({success:true,message:"Subscribed Ipo"})
 
 })
 
