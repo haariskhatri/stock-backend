@@ -94,7 +94,7 @@ iporouter.get('/singleipo/:componyid', isAuth, Authjwt, async (req, res) => {
 })
 
 iporouter.get('/getipo', async (req, res) => {
-    const ipo = await ipoModel.find();
+    const ipo =await getActiveIpos();
     res.json({ success: true, ipo: ipo })
 })
 

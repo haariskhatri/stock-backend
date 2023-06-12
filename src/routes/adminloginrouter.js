@@ -8,7 +8,7 @@ const userModel = require('../models/User');
 const { debitBalance, addStocktoUser } = require('../controllers/User');
 const shareModel = require('../models/share');
 const { addShare } = require('../controllers/Share');
-const { decreaseIpo, getIpoUser, decreaseSlot,getcomponyshare } = require('../controllers/Ipo');
+const { decreaseIpo, getIpoUser, decreaseSlot, getcomponyshare } = require('../controllers/Ipo');
 const { allocateIpo } = require('../controllers/AllocateSlot');
 const app = express();
 
@@ -44,20 +44,18 @@ const Authjwt = (req, res, next) => {
   }
 }
 
-const checkadmin=(req,res,next)=>{
-  if(req.session.email == 'kishan.dave@minddeft.net')
-  {
+const checkadmin = (req, res, next) => {
+  if (req.session.email == 'kishan.dave@minddeft.net') {
     next()
-  }else
-  {
+  } else {
     res.json({ success: false, message: "Only Admin Can Access" })
-    
+
   }
 }
 
-adminloginrouter.get('/admincompony',checkadmin, async (req, res) => {
+adminloginrouter.get('/admincompony', checkadmin, async (req, res) => {
   const ipo = ipoModel.find();
-  res.json({success:true,ipo:ipo})
+  res.json({ success: true, ipo: ipo })
 })
 
 
@@ -67,22 +65,22 @@ adminloginrouter.get('/logout', async (req, res) => {
 })
 
 
-adminloginrouter.get('/cancelipo/:companyId',checkadmin, async (req, res) => {
-  const data = ipoModel.findOneAndDelete({companyId:req.params.companyId});
+adminloginrouter.get('/cancelipo/:companyId', checkadmin, async (req, res) => {
+  const data = ipoModel.findOneAndDelete({ companyId: req.params.companyId });
   res.json({ success: true, message: "Ipo Canceled" })
 
 
 })
 
-adminloginrouter.get('/checkadmin',checkadmin, async (req, res) => {
-  
+adminloginrouter.get('/checkadmin', checkadmin, async (req, res) => {
+
   res.json({ success: true, message: "Admin" })
 
 })
 
 
 
-adminloginrouter.get('/allocation_slot/:componyId',checkadmin, async (req, res) => {
+adminloginrouter.get('/allocation_slot/:componyId', checkadmin, async (req, res) => {
 
 
   const componyId = req.params.componyId
@@ -91,6 +89,7 @@ adminloginrouter.get('/allocation_slot/:componyId',checkadmin, async (req, res) 
   var companyShares = ipos.companyShares;
   var minimumshare = ipos.companySlotSize;
   var valuepershare = ipos.companyValuepershare;
+
 
   const slot = companyShares / minimumshare;//20
 
@@ -119,93 +118,63 @@ adminloginrouter.get('/allocation_slot/:componyId',checkadmin, async (req, res) 
 
     var count = ipos.companyShares;//20
     console.log("Over Subscriber");
+    var unique = [];
+
     while (count > 0) {
-      console.log(count); 
-    
+      console.log(count);
+
       if (count > 0) {
         console.log("enter counter");
         await getIpoUser(componyId).then(async (data) => {
           const users = data;
-    
+
           if (users.length > 0) {
             // Process users data
             for (const u of users) {
-              if(count>0)
-              {
+              if (count > 0) {
+                if(u.userBalance >=(minimumshare * valuepershare))
+                {
 
-                console.log("after");
-                console.log("User", users);
-                console.log("Under Map");
-                const balance = minimumshare * valuepershare;
-              
+                  console.log("check For unique");
+                  if (unique.includes(u.customerId)) {
+                    console.log("Not Unique ",u.customerId);
+                  } else {
+                    console.log("Id is in else : ",u.customerId);
+                    unique.push(u.customerId)
+                    
+                   
+                    //console.log("User", users);
+                    console.log("Under Map");
+                    const balance = minimumshare * valuepershare;
+  
   
                     await debitBalance(u.customerId, balance);
                     await addStocktoUser(u.customerId, ipos.companySymbol, minimumshare);
-                    //await decreaseSlot(u.customerId, componyId, minimumshare);
-                    //await decreaseIpo(componyId, minimumshare)
-      
-          
-                    console.log("Company Function");
+                    await decreaseSlot(u.slotId, componyId, minimumshare);
+                    //await decreaseIpo(u._id, minimumshare)
+                    unique.push(u.customerId);
+                   
                     count -= minimumshare;
                     console.log("Map In: " + count);
+                  }
+                }
+
               }
-                
+
             }
-            
+
+            unique=[];
           } else {
-          
+
             count = 0;
           }
         });
       }
     }
-    // while (count > 0) {
-    //   console.log(count);//30
-    //   await getIpoUser(componyId).then((data) => {
-    //     users = data
-    //   }).then(async()=>{
-    //     for (const u of users) {
-    //       console.log("after");
-    //       console.log("User", users);
-    //       console.log("Under Map");
-    //       const balance = minimumshare * valuepershare;
-
-    //       await debitBalance(u.customerId, balance);
-    //       await addStocktoUser(u.customerId, ipos.companySymbol, minimumshare);
-    //       await decreaseSlot(u.customerId, componyId, minimumshare);
-
-    //       console.log("Company Function");
-    //       count -= minimumshare;
-    //       console.log("Map In: " + count);
-    //     }
-        // users.map(async (u) => {
-        //     if (count > 0) {
-        //     console.log("after");
-        //     console.log("User", users);
-            
-        //     console.log("Under Map");
-        //     const balance = minimumshare * valuepershare
-            
-        //     debitBalance(u.customerId, balance).then(() => {
-
-        //       addStocktoUser(u.customerId, ipos.companySymbol, minimumshare).then(() => {
-                
-        //         decreaseSlot(u.customerId,componyId,minimumshare).then((data) => {
-        //           console.log("Compny Function");
-        //           count -= minimumshare;
-        //           console.log("Map In: " + count);
-        //       })
-        //     })
-        //   })
-        //   // await decreaseIpo(componyId, minimumshare)
-          
-        // }
-        // })
-    //})
-      //}
+   
 
     console.log("exit while");
-    await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
+   await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
     await ipoModel.findOneAndDelete({ companyId: req.params.componyId })
 
   }
