@@ -77,11 +77,8 @@ iporouter.post('/getipo', async (req, res) => {
 
 
 iporouter.post('/iposub', isAuth, Authjwt, async (req, res) => {
-    const { ipo_id, minimumslot } = req.body;
-    const customerId = req.session.userId;
+    const { ipo_id } = req.body;
 
-    //   const ans=await addSlot(customerId, ipo_id, minimumslot)
-    //   console.log(ans);
     const customerid = req.session.userId;
     console.log("Ipo is: ", ipo_id);
     const amount = await ipoModel.findOne({ companyId: ipo_id });
