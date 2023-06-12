@@ -46,7 +46,7 @@ const Subscribeipo=async(customerId,ipoId,amount)=>{
        const getid=await getslotId()
        await incrementSlotId(getid);
     // const checkUserExists=await ipomapsModel.find({customerId:customerId,ipoId:ipoId})
-    
+
     // if(checkUserExists.length !== 0)
     // {
     //     await ipomapsModel.findOneAndUpdate({customerId:customerId,ipoId:ipoId}, {'$inc' : {'slotAmount': amount}})
@@ -59,9 +59,9 @@ const Subscribeipo=async(customerId,ipoId,amount)=>{
     // }
 }
 
-const decreaseIpo=async(companyId,amount)=>{
-    await ipoModel.findOneAndUpdate({companyId:companyId},{'$inc':{'companyShares': - amount}})
-    
+const decreaseIpo = async (companyId, amount) => {
+    await ipoModel.findOneAndUpdate({ companyId: companyId }, { '$inc': { 'companyShares': - amount } })
+
     return 200;
 }
 
@@ -78,18 +78,18 @@ const decreaseSlot=async(slotId,ipoId,minimumshare)=>{
     return getIposlot;
 }
 
-const checkiposlot=async(customerId,ipoId)=>{
-    const getslot= ipomapsModel.findOne({customerId: customerId,ipoId:ipoId })
+const checkiposlot = async (customerId, ipoId) => {
+    const getslot = ipomapsModel.findOne({ customerId: customerId, ipoId: ipoId })
     return getslot;
 }
 
-const getcomponyshare=(companyId)=>{
-    const getcomponyshare=ipoModel.findOne({companyId:companyId});
+const getcomponyshare = (companyId) => {
+    const getcomponyshare = ipoModel.findOne({ companyId: companyId });
     return getcomponyshare;
 }
 
 
 
-module.exports = { getId, getallIpo, getActiveIpos, incrementId,Subscribeipo,decreaseIpo,getIpoUser,decreaseSlot,checkiposlot,getcomponyshare,getIpo,getIpoById }
+module.exports = { getId, getallIpo, getActiveIpos, incrementId, Subscribeipo, decreaseIpo, getIpoUser, decreaseSlot, checkiposlot, getcomponyshare, getIpo, getIpoById }
 
 

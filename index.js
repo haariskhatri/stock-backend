@@ -29,9 +29,10 @@ const sharesrouter = require('./src/routes/sharesrouter');
 const signuprouter = require('./src/routes/signuprouter');
 const loginrouter = require('./src/routes/loginrouter');
 const adminloginrouter = require('./src/routes/adminloginrouter');
-const path = require('path');
+const multer = require('multer');
 const { log } = require('console');
 const { getIpoSlots, getTotalSlots, getSubscribed, checkSubscription } = require('./src/controllers/Slot');
+const path = require('path');
 
 
 
@@ -104,13 +105,15 @@ io.on('connection', async (socket) => {
 
     socket.on('buyOrder', async (data) => {
         const result = await buyOrder(data);
+
+        io.emit('updateorder', getStockMap(result.stock))
+        getShareWithSymbol(result.stock).then((data) => {
+            io.emit('takestock', data)
+            io.emit('userbalance');
+        })
+
         if (result.added == 1) {
             socket.emit('buysuccess');
-            io.emit('updateorder', getStockMap(result.stock))
-            getShareWithSymbol(result.stock).then((data) => {
-                io.emit('takestock', data)
-                io.emit('userbalance');
-            })
         }
         console.log('result', result);
 
@@ -142,14 +145,15 @@ io.on('connection', async (socket) => {
 
 
         const result = await sellOrder(data);
-        console.log('result', result)
+        io.emit('updateorder', getStockMap(result.stock))
+        getShareWithSymbol(result.stock).then((data) => {
+            io.emit('takestock', data)
+            io.emit('userbalance');
+        })
+        console.log('result', data)
         if (result.added == 1) {
             socket.emit('buysuccess');
-            io.emit('updateorder', getStockMap(result.stock))
-            getShareWithSymbol(result.stock).then((data) => {
-                io.emit('takestock', data)
-                io.emit('userbalance');
-            })
+
         }
 
         // if (matched == 200) {
@@ -165,6 +169,8 @@ io.on('connection', async (socket) => {
 
 
 })
+
+
 
 io.listen(8000);
 
