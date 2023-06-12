@@ -1,12 +1,14 @@
 const express = require('express');
 const { ipoCounterModel } = require('../models/counters');
 const ipoModel = require('../models/ipo');
-const { getallIpo, getActiveIpos, getId, getIpo,Subscribeipo } = require('../controllers/Ipo');
+const { getallIpo, getActiveIpos, getId, getIpo, Subscribeipo } = require('../controllers/Ipo');
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie-parser');
 const ipomapsModel = require('../models/ipomaps');
 const { addSlot } = require('../controllers/Slot');
 const { addCompany } = require('../models/company');
+const multer = require('multer');
+const path = require('path');
 
 
 const iporouter = express.Router();
@@ -75,16 +77,16 @@ iporouter.post('/getipo', async (req, res) => {
 
 
 iporouter.post('/iposub', isAuth, Authjwt, async (req, res) => {
-     const { ipo_id,minimumslot } = req.body;
-     const customerId=req.session.userId;
-     
+    const { ipo_id, minimumslot } = req.body;
+    const customerId = req.session.userId;
+
     //   const ans=await addSlot(customerId, ipo_id, minimumslot)
     //   console.log(ans);
-    const customerid=req.session.userId;
-    console.log("Ipo is: ",ipo_id);
-    const amount=await ipoModel.findOne({companyId:ipo_id});
-    await Subscribeipo(customerid,ipo_id,amount.companySlotSize)
-     res.json({success:true,message:"Subscribed Ipo"})
+    const customerid = req.session.userId;
+    console.log("Ipo is: ", ipo_id);
+    const amount = await ipoModel.findOne({ companyId: ipo_id });
+    await Subscribeipo(customerid, ipo_id, amount.companySlotSize)
+    res.json({ success: true, message: "Subscribed Ipo" })
 
 })
 
@@ -101,8 +103,25 @@ iporouter.get('/getipo', async (req, res) => {
     res.json({ success: true, ipo: ipo })
 })
 
-iporouter.post('/addipo', async (req, res) => {
 
+
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '..', '..', 'images'));
+    },
+    filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        cb(null, `${req.body.companySymbol}.${ext}`);
+
+    },
+});
+
+const upload = multer({
+    storage: multerStorage,
+});
+
+
+iporouter.post('/addipo', async (req, res) => {
     const {
         companyId,
         companyName,
@@ -118,9 +137,6 @@ iporouter.post('/addipo', async (req, res) => {
         companyEnddate,
         companyDescription
     } = req.body;
-
-
-
 
 
     const save = await ipoModel({
@@ -145,8 +161,25 @@ iporouter.post('/addipo', async (req, res) => {
 
     console.log("Saved");
 
-    res.json(true);
 
+    res.json(true);
+})
+
+iporouter.post('/uploadlogo', upload.single('companyLogo'), async (req, res) => {
+
+    console.log(req.body)
+    res.json(true);
+    // try {
+    //     const newFile = await File.create({
+    //         name: req.body.companySymbol,
+    //     });
+
+
+
+    // } catch (error) {
+    //     console.log(error);
+    //     res.json(false);
+    // }
 })
 
 
