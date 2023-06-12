@@ -1,6 +1,7 @@
 const { ipoCounterModel } = require("../models/counters");
 const ipoModel = require("../models/ipo");
 const ipomapsModel = require("../models/ipomaps");
+const { getslotId, incrementSlotId } = require("./Slot");
 const { normalizeDate } = require("./utiity");
 
 
@@ -42,6 +43,8 @@ const getActiveIpos = async () => {
 }
 
 const Subscribeipo=async(customerId,ipoId,amount)=>{
+       const getid=await getslotId()
+       await incrementSlotId(getid);
     // const checkUserExists=await ipomapsModel.find({customerId:customerId,ipoId:ipoId})
     
     // if(checkUserExists.length !== 0)
@@ -49,7 +52,7 @@ const Subscribeipo=async(customerId,ipoId,amount)=>{
     //     await ipomapsModel.findOneAndUpdate({customerId:customerId,ipoId:ipoId}, {'$inc' : {'slotAmount': amount}})
     //     return 200;
     // }else{
-        const ipo= new ipomapsModel({customerId:customerId,ipoId:ipoId,slotAmount:amount})
+        const ipo= new ipomapsModel({slotId:getid,customerId:customerId,ipoId:ipoId,slotAmount:amount})
         await ipo.save();
         return 200;
         
@@ -63,15 +66,15 @@ const decreaseIpo=async(companyId,amount)=>{
 }
 
 const getIpoUser=async(ipoId)=>{
-    const getIpo = await ipomapsModel.find({ipoId:ipoId , 'slotAmount' : {$gt : 1} })
+    const getIpo = await ipomapsModel.find({ipoId:ipoId , 'slotAmount' : {$gt : 0} })
     return getIpo;
 }
 
 // getIpoUser(47).then((data)=>{
 //     console.log(data.length);
 // })
-const decreaseSlot=async(customerId,ipoId,minimumshare)=>{
-    const getIposlot =  ipomapsModel.updateOne({ customerId: customerId,ipoId:ipoId }, { '$inc': { 'slotAmount': - minimumshare } })
+const decreaseSlot=async(slotId,ipoId,minimumshare)=>{
+    const getIposlot =  ipomapsModel.updateOne({ slotId: slotId,ipoId:ipoId }, { '$inc': { 'slotAmount': - minimumshare } })
     return getIposlot;
 }
 
