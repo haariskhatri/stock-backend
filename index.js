@@ -21,7 +21,7 @@ const { iporouter } = require('./src/routes/iporouter');
 const traderouter = require('./src/routes/traderouter');
 const sharerouter = require('./src/routes/sharerouter');
 const { getSharePrice, getShare, getAllShares, getsharesinit, getShareSymbol, getPrice, getShareWithSymbol } = require('./src/controllers/Share');
-const { buyOrder, sellOrder, newBuy, setstockmap, getStockMap, match3 } = require('./src/controllers/BuySell');
+const { buyOrder, sellOrder, newBuy, setstockmap, getStockMap, match3, printmap } = require('./src/controllers/BuySell');
 const shareModel = require('./src/models/share');
 const userModel = require('./src/models/User');
 const { addUser, addStocktoUser, debitBalance, creditBalance, getInvestment, getPrices, getUserBalance } = require('./src/controllers/User');
@@ -33,6 +33,8 @@ const multer = require('multer');
 const { log } = require('console');
 const { getIpoSlots, getTotalSlots, getSubscribed, checkSubscription } = require('./src/controllers/Slot');
 const path = require('path');
+const { priceModel } = require('./src/models/prices');
+const { appendPrice, getPriceArray } = require('./src/controllers/Price');
 
 
 
@@ -111,6 +113,15 @@ io.on('connection', async (socket) => {
             io.emit('takestock', data)
             io.emit('userbalance');
         })
+        getPriceArray(result.stock).then((data) => {
+            io.emit('priceupdate', data)
+        })
+
+        if (result.matched == 1) {
+
+            console.log(getStockMap(result.stock))
+
+        }
 
         if (result.added == 1) {
             socket.emit('buysuccess');
@@ -141,18 +152,39 @@ io.on('connection', async (socket) => {
 
     })
 
+    socket.on('getprices', (data) => {
+        console.log('prices', data)
+        getPriceArray(data).then((datanew) => {
+            socket.emit('priceupdate', datanew)
+        })
+    })
+
     socket.on('sellOrder', async (data) => {
 
 
         const result = await sellOrder(data);
-        io.emit('updateorder', getStockMap(result.stock))
+
+
+        if (result.matched == 1) {
+
+            console.log(getStockMap(result.stock))
+            io.emit('updateorder', getStockMap(result.stock))
+
+        }
+
+        getPriceArray(result.stock).then((data) => {
+            io.emit('priceupdate', data)
+        })
+
+
+
         getShareWithSymbol(result.stock).then((data) => {
             io.emit('takestock', data)
             io.emit('userbalance');
         })
-        console.log('result', data)
+
         if (result.added == 1) {
-            socket.emit('buysuccess');
+            socket.emit('sellsuccess');
 
         }
 
@@ -172,7 +204,10 @@ io.on('connection', async (socket) => {
 
 
 
+
+
 io.listen(8000);
+
 
 
 server.listen(4000, async () => {
