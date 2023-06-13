@@ -3,6 +3,10 @@ const mongoose = require('mongoose')
 
 const ipomapsSchema = mongoose.Schema(
     {
+        slotId:{
+            type: Number,
+            required: true
+        },
         customerId: {
             type: Number,
             required: true

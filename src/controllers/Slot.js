@@ -134,5 +134,8 @@ module.exports = {
     getIpoSlots,
     getTotalSlots,
     getSubscribed,
-    checkSubscription
+    checkSubscription,
+    getslotId,
+    incrementSlotId
+
 }
