@@ -136,7 +136,7 @@ const getPrices = async () => {
     return prices;
 }
 
-const getInvestment = async (userId,) => {
+const getInvestment = async (userId) => {
 
     if (userId === null) {
         return 0;
