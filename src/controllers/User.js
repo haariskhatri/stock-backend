@@ -146,6 +146,7 @@ const getInvestment = async (userId) => {
     const keys = [...result.keys()];
     var investment = 0;
     keys.map(ele => {
+        
         const shares = result.get(ele);
         const value = prices.get(ele);
         investment += shares * value;
