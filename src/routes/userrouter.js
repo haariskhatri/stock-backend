@@ -25,9 +25,9 @@ userrouter.get('/getinvestment', async (req, res) => {
     if (req.session.userId) {
 
         const result = (await userModel.findOne({ 'userId': req.session.userId }).select({ 'userPortfolio': 1 })).userPortfolio;
+
         const totalinv = await addUser.getInvestment(req.session.userId)
         const price = await getsharesinit()
-        console.log(price);
 
         res.json({ user: result, total: totalinv, price: price })
     }
