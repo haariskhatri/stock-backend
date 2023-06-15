@@ -14,6 +14,7 @@ const stopIpo = async (id) => {
     return await ipoModel.deleteOne({ 'companyId': id });
 }
 
+
 const addIpotoMarket = async (id) => {
 
     const ipo = await getIpoById(id);
