@@ -2,6 +2,7 @@
 const userModel = require('../models/User')
 const { userIdModel } = require('../models/counters');
 const shareModel = require('../models/share');
+const { tradeModel } = require('../models/trades');
 
 // class User {
 //     constructor(userId, userName, userFullName,) {
@@ -104,12 +105,48 @@ const creditBalance = async (userId, amount) => {
     await userModel.updateOne({ 'userId': userId }, { '$inc': { 'userBalance': amount } })
 }
 
+const getProfitForDay = async (userId) => {
+    const shares = await shareModel.find({});
+    const shareprices = new Map();
+
+    await shares.map(ele => {
+        shareprices.set(ele.shareSymbol, ele.sharePrice);
+    })
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+
+    const trades = await tradeModel.find({
+        $and: [
+            { $or: [{ sellerId: userId }, { buyerId: userId }] },
+            { date: { $gte: today } }
+        ]
+    })
+    const buytrades = await trades.filter(item => item.buyerId == userId)
+
+    var totalbuymarket = 0;
+    var totalbuyuser = 0;
+
+    await buytrades.map(ele => {
+        totalbuymarket += (shareprices.get(ele.stock) * ele.shares)
+        totalbuyuser += (ele.shares * ele.priceLimit)
+    })
+
+
+    const result = {}
+    const status = (totalbuymarket >= totalbuyuser ? 'profit' : 'loss');
+    result.verdict = status;
+    result.amount = (result.status == 'profit' ? totalbuymarket - totalbuyuser : totalbuyuser - totalbuymarket)
+    return result;
+}
+
 const getUserBalance = async (userId) => {
 
-    if (!userId){
+    if (!userId) {
         return 0;
     }
-    else{
+    else {
 
         const result = await userModel.findOne({ 'userId': userId });
         return result.userBalance;
@@ -135,6 +172,22 @@ const getPrices = async () => {
     })
     return prices;
 }
+
+const getTradesOfUser = async (userId) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const trades = await tradeModel.find({
+        $and: [
+            { $or: [{ sellerId: userId }, { buyerId: userId }] },
+            { date: { $gte: today } }
+        ]
+    }).sort({ date: 'desc' })
+    return trades;
+
+}
+
+
 
 const getInvestment = async (userId,) => {
 
@@ -165,5 +218,7 @@ module.exports = {
     creditBalance,
     getInvestment,
     getPrices,
-    getusershare
+    getusershare,
+    getProfitForDay,
+    getTradesOfUser
 };
