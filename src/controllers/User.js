@@ -189,7 +189,23 @@ const getTradesOfUser = async (userId) => {
 
 
 
-const getInvestment = async (userId,) => {
+const getTradesOfUser2 = async (userId) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const trades = await tradeModel.find({
+        $and: [
+            { $or: [{ sellerId: userId }, { buyerId: userId }] },
+            { date: { $gte: today } }
+        ]
+    }).sort({ date: 'desc' })
+    return trades;
+
+}
+
+
+
+const getInvestment = async (userId) => {
 
     if (userId === null) {
         return 0;
@@ -199,6 +215,7 @@ const getInvestment = async (userId,) => {
     const keys = [...result.keys()];
     var investment = 0;
     keys.map(ele => {
+
         const shares = result.get(ele);
         const value = prices.get(ele);
         investment += shares * value;
