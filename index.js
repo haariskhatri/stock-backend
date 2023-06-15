@@ -42,7 +42,7 @@ const { appendPrice, getPriceArray } = require('./src/controllers/Price');
 
 const app = express();
 const server = http.createServer(app)
-const io = new Server({ cors: { origin: 'http://localhost:5173' } });
+const io = new Server(server, { cors: { origin: 'http://localhost:5173' } });
 const store = new MongoDBSession({
     uri: 'mongodb+srv://root:Haaris8785@cluster0.walzl.mongodb.net/stock',
     collection: "mySessionsss"
@@ -206,7 +206,6 @@ io.on('connection', async (socket) => {
 
 
 
-io.listen(8000);
 
 
 
