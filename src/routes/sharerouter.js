@@ -2,6 +2,9 @@ const { Router } = require("express");
 const { getSharePrice, addShare, getTopShares, getShare, getAllShares, getShareWithSymbol } = require("../controllers/Share");
 
 const sharerouter = Router();
+const dotenv = require('dotenv');
+dotenv.config();
+
 const isAuth = (req, res, next) => {
     if (req?.session?.isAuth) {
         next()
@@ -14,7 +17,7 @@ const isAuth = (req, res, next) => {
 const Authjwt = (req, res, next) => {
     const token = req?.cookie?.jwt;
     if (token) {
-        jwt.verify(token, 'my-secret-key', (err, decode) => {
+        jwt.verify(token, process.env.JWT_KEY, (err, decode) => {
             if (err) {
                 res.json({ success: false, message: err })
             }

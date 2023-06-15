@@ -8,9 +8,12 @@ const io = new Server({ cors: { origin: 'http://localhost:5173' } });
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
 const { isAuth, Authjwt } = require('../routes/iporouter')
+const dotenv = require('dotenv');
+dotenv.config();
 
 app.use(express.json());
 app.use(cors());
+
 const loginrouter = express.Router();
 
 
@@ -21,6 +24,7 @@ loginrouter.post('/login', async (req, res) => {
 
   const session = await UserSession.find({ "email": email });
 
+
   if (user[0]?.userStatus == 1) {
 
     if (user[0]?.email == email && bcrypt.compareSync(password, user[0].password)) {
@@ -29,7 +33,7 @@ loginrouter.post('/login', async (req, res) => {
       req.session.email = email;
       req.session.userId = user[0].userId;
 
-      const token = jwt.sign({ 'email': email }, 'my-secret-key')
+      const token = jwt.sign({ 'email': email }, process.env.JWT_KEY)
       const sessionmod = await UserSession.findOneAndUpdate({ "email": email }, { "jwt_id": token })
       const passwordHash = bcrypt.hashSync(password, 10);
 
@@ -57,27 +61,24 @@ loginrouter.get('/usernow', isAuth, Authjwt, (req, res) => {
   res.json({ 'id': req.session.userId, 'email': req.session.email });
 })
 
-loginrouter.get('/checksession',(req,res)=>{
-  if(req.session.isAuth)
-  {
-    res.json({success:true})
+loginrouter.get('/checksession', (req, res) => {
+  if (req.session.isAuth) {
+    res.json({ success: true })
   }
-  else
-  {
-    res.json({success:false})
+  else {
+    res.json({ success: false })
 
   }
 })
 
-loginrouter.post('/adminlogin',(req,res)=>{
-  const {email,password}=req.body;
-  if(email=="kishan.dave@minddeft.net" && password=="1234")
-  {
-    req.session.email=email;
-    req.session.userId=13;
-    res.json({success:true})
-  }else{
-    res.json({success:false})
+loginrouter.post('/adminlogin', (req, res) => {
+  const { email, password } = req.body;
+  if (email == "kishan.dave@minddeft.net" && password == "1234") {
+    req.session.email = email;
+    req.session.userId = 13;
+    res.json({ success: true })
+  } else {
+    res.json({ success: false })
 
   }
 })
