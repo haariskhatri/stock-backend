@@ -3,10 +3,11 @@ const { tradeIdModel } = require("../models/counters")
 const { getShares, addStocktoUser, debitStock, getUserBalance, debitBalance, creditBalance, getusershare } = require("./User")
 const { addTrade } = require("../models/trades")
 const { assert, match } = require('assert')
-const { getAllShares, getShareSymbol, increasePrice, decreasePrice, changePrice, getShareWithSymbol } = require("./Share")
+const { getAllShares, getShareSymbol, increasePrice, decreasePrice, changePrice, getShareWithSymbol, getsharesinit } = require("./Share")
 const { log } = require("console")
 const { sendMail } = require("./Mail")
 const { appendPrice } = require("./Price")
+const userModel = require("../models/User")
 
 
 
