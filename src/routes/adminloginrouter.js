@@ -11,6 +11,8 @@ const { addShare } = require('../controllers/Share');
 const { decreaseIpo, getIpoUser, decreaseSlot, getcomponyshare } = require('../controllers/Ipo');
 const { allocateIpo } = require('../controllers/AllocateSlot');
 const app = express();
+const dotenv = require('dotenv');
+dotenv.config();
 
 
 app.use(express.json());
@@ -29,7 +31,7 @@ const isAuth = (req, res, next) => {
 const Authjwt = (req, res, next) => {
   const token = req?.cookie?.jwt;
   if (token) {
-    jwt.verify(token, 'my-secret-key', (err, decode) => {
+    jwt.verify(token, process.env.JWT_KEY, (err, decode) => {
       if (err) {
         res.json({ success: false, message: err })
       }
@@ -132,28 +134,27 @@ adminloginrouter.get('/allocation_slot/:componyId', checkadmin, async (req, res)
             // Process users data
             for (const u of users) {
               if (count > 0) {
-                if(u.userBalance >=(minimumshare * valuepershare))
-                {
+                if (u.userBalance >= (minimumshare * valuepershare)) {
 
                   console.log("check For unique");
                   if (unique.includes(u.customerId)) {
-                    console.log("Not Unique ",u.customerId);
+                    console.log("Not Unique ", u.customerId);
                   } else {
-                    console.log("Id is in else : ",u.customerId);
+                    console.log("Id is in else : ", u.customerId);
                     unique.push(u.customerId)
-                    
-                   
+
+
                     //console.log("User", users);
                     console.log("Under Map");
                     const balance = minimumshare * valuepershare;
-  
-  
+
+
                     await debitBalance(u.customerId, balance);
                     await addStocktoUser(u.customerId, ipos.companySymbol, minimumshare);
                     await decreaseSlot(u.slotId, componyId, minimumshare);
                     //await decreaseIpo(u._id, minimumshare)
                     unique.push(u.customerId);
-                   
+
                     count -= minimumshare;
                     console.log("Map In: " + count);
                   }
@@ -163,7 +164,7 @@ adminloginrouter.get('/allocation_slot/:componyId', checkadmin, async (req, res)
 
             }
 
-            unique=[];
+            unique = [];
           } else {
 
             count = 0;
@@ -171,10 +172,10 @@ adminloginrouter.get('/allocation_slot/:componyId', checkadmin, async (req, res)
         });
       }
     }
-   
+
 
     console.log("exit while");
-   await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
+    await addShare(ipos.companyName, ipos.companySymbol, ipos.companyValuepershare, ipos.companyShares, ipos.companyDescription, "Manufacture")
     await ipoModel.findOneAndDelete({ companyId: req.params.componyId })
 
   }

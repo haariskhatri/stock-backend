@@ -42,15 +42,15 @@ const { appendPrice, getPriceArray } = require('./src/controllers/Price');
 
 const app = express();
 const server = http.createServer(app)
-const io = new Server({ cors: { origin: 'http://localhost:5173' } });
+const io = new Server(server, { cors: { origin: '*' } });
 const store = new MongoDBSession({
-    uri: 'mongodb+srv://root:Haaris8785@cluster0.walzl.mongodb.net/stock',
+    uri: process.env.MONGO_URL,
     collection: "mySessionsss"
 })
 
 app.use(
     session({
-        secret: "key that will sign cookie",
+        secret: process.env.SESSION_KEY,
         resave: false,
         saveUninitialized: false,
         store: store,
@@ -206,13 +206,12 @@ io.on('connection', async (socket) => {
 
 
 
-io.listen(8000);
 
 
 
 server.listen(4000, async () => {
     console.log("Listening");
-    mongoose.connect('mongodb+srv://root:Haaris8785@cluster0.walzl.mongodb.net/stock')
+    mongoose.connect(process.env.MONGO_URL)
     await setstockmap();
     console.log("Mongoose Connected");
 })

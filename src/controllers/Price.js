@@ -6,7 +6,10 @@ const appendPrice = async (stock, value) => {
 }
 
 const getPriceArray = async (stock) => {
-    return (await priceModel.findOne({ 'stock': stock })).price;
+    const result = (await priceModel.findOne({ 'stock': stock }))
+    return result.price;
 }
+
+
 
 module.exports = { appendPrice, getPriceArray }

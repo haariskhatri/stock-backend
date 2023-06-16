@@ -13,6 +13,8 @@ const { Server } = require('socket.io');
 const userModel = require('../models/User');
 const UserSession = require('../models/SessionModel');
 const { otpMail } = require('../controllers/Mail');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 
@@ -66,7 +68,7 @@ signuprouter.post('/verifyotp', async (req, res) => {
   const { otp } = req.body;
   if (otp == req.session.otp) {
     const email = req.session.email;
-    const token = jwt.sign({ email }, "my-secret-key")
+    const token = jwt.sign({ email }, process.env.JWT_KEY)
     res.cookie('jwt', token, { httpOnly: true, expires: 0 })
     const userses = new UserSession({ email: email, jwt_id: token });
     await userses.save();

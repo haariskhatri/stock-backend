@@ -10,70 +10,13 @@ const { appendPrice } = require("./Price")
 const userModel = require("../models/User")
 
 
-
-// const getTradeId = async () => {
-//     const result = await tradeIdModel.find({});
-//     return result[0].trade_id;
-// }
-const matchfunc = async (stock) => {
-    const actualStock = stockMap.get(stock);
-    const buyarr = actualStock[0];
-    const sellarr = actualStock[1];
-
-    if (buyarr.length === 0 || sellarr.length === 0) {
-        return false;
-    } else {
-        buyarr.forEach(async (buy, buyIndex) => {
-            const matchingSellOrders = sellarr.filter((sell) => sell.price <= buy.price);
-
-            let remainingSharesToBuy = buy.shares;
-            let matched = false;
-
-            for (let i = 0; i < matchingSellOrders.length; i++) {
-                const sell = matchingSellOrders[i];
-
-                if (await getUserBalance(buy.userId) < buy.shares * buy.price || buy.userId === sell.userId) {
-                    console.log('Invalid');
-                    return false;
-                }
-
-                if (await getShares(sell.userId, sell.stockId) < remainingSharesToBuy) {
-                    continue;
-                }
-
-                await changePrice(sell.stockId, sell.price);
-                await debitStock(sell.userId, sell.stockId, remainingSharesToBuy);
-                await debitBalance(buy.userId, remainingSharesToBuy * sell.price);
-                await addStocktoUser(buy.userId, sell.stockId, remainingSharesToBuy);
-                await creditBalance(sell.userId, remainingSharesToBuy * sell.price);
-
-                const id = await addTrade(buy.userId, sell.userId, buy.stockId, remainingSharesToBuy, sell.price);
-                sendMail(buy.userEmail, id, 'Buy', buy.stockId, remainingSharesToBuy, 'debit', remainingSharesToBuy * sell.price);
-                sendMail(sell.userEmail, id, 'Sell', sell.stockId, remainingSharesToBuy, 'credit', remainingSharesToBuy * sell.price);
-
-                sell.shares -= remainingSharesToBuy;
-                buyarr.splice(buyIndex, 1);
+const tradeUsers = new Set(); //keep track of users who have traded
+const market = false;
 
 
-                if (sell.shares === 0) {
-                    sellarr.splice(sellarr.indexOf(sell), 1);
+const endMarket = () => {
 
-                }
-
-                remainingSharesToBuy -= remainingSharesToBuy;
-                matched = true;
-
-                console.log('matched');
-                break;
-            }
-
-            if (!matched) {
-                return false;
-            }
-        });
-    }
-};
-
+}
 
 
 const incrementTradeId = async (previous) => {
@@ -81,30 +24,8 @@ const incrementTradeId = async (previous) => {
     return 200;
 }
 
-// const recordBuyOrder = async (stock_id, customer_id, quantity, tradetype, price) => {
-
-//     const tradeId = await getTradeId();
-
-//     const buyorder = await buyModel({
-//         tradeId: tradeId,
-//         customerId: customer_id,
-//         stockId: stock_id,
-//         tradePrice: price,
-//         tradeType: tradetype,
-//         tradeQty: quantity
-//     }).save();
-
-//     await incrementTradeId(tradeId);
-
-//     return 200;
-// }
-
-
-
 
 const stockMap = new Map();
-
-
 
 
 const setstockmap = async () => {
@@ -119,30 +40,6 @@ const setstockmap = async () => {
     return 200;
 }
 
-
-
-
-
-
-// const buyOrder = (data) => {
-//     const { stockId } = data;
-
-//     switch (stockId) {
-//         case 'ADA':
-//             bADA.push(data);
-//             console.log(bADA[0]);
-//             break;
-//         case 'REL':
-//             bREL.push(data);
-//             console.log(bREL[0]);
-//             break;
-//         case 'TATA':
-//             bTATA.push(data);
-//             console.log(bTATA[0]);
-//             break;
-
-//     }
-// }
 
 const printmap = () => {
     return stockMap;
@@ -248,6 +145,8 @@ const match3 = async (stock) => {
                         sendMail(sell.userEmail, id, 'Sell', sell.stockId, sell.shares, 'credit', sell.shares * sell.price);
                         sellarr.splice(sellarr.indexOf(sell), 1);
                         await appendPrice(buy.stockId, [Date.now(), sell.price])
+                        tradeUsers.add(buy.userId)
+                        tradeUsers.add(sell.userId)
                         console.log('matched');
                         matched = true;
 
@@ -269,6 +168,8 @@ const match3 = async (stock) => {
                         sendMail(buy.userEmail, id, 'Buy', buy.stockId, buy.shares, 'debit', buy.shares * buy.price);
                         sendMail(sell.userEmail, id, 'Sell', sell.stockId, buy.shares, 'credit', buy.shares * sell.price);
                         await appendPrice(buy.stockId, [Date.now(), sell.price])
+                        tradeUsers.add(buy.userId)
+                        tradeUsers.add(sell.userId)
                         buyarr.splice(buyarr.splice(buyarr.indexOf(buy), 1));
                         console.log('matched');
                         matched = true;
@@ -484,7 +385,6 @@ module.exports = {
     matchOrder,
     setstockmap,
     getStockMap,
-    matchfunc,
     match3,
     printmap
 

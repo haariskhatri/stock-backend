@@ -9,6 +9,8 @@ const { addSlot } = require('../controllers/Slot');
 const { addCompany } = require('../models/company');
 const multer = require('multer');
 const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config();
 
 
 const iporouter = express.Router();
@@ -27,7 +29,7 @@ const Authjwt = (req, res, next) => {
     const token = req?.cookies?.jwt;
 
     if (token) {
-        jwt.verify(token, 'my-secret-key', (err, decode) => {
+        jwt.verify(token, process.env.JWT_KEY, (err, decode) => {
             if (err) {
                 res.json({ success: false, message: err })
             }
@@ -102,9 +104,9 @@ iporouter.get('/singleipo/:componyid', isAuth, Authjwt, async (req, res) => {
 })
 
 iporouter.get('/getipo', async (req, res) => {
-    const ipo =await getActiveIpos();
-    const ipodata=await ipomapsModel.find();
-    res.json({ success: true, ipo: ipo,ipodata:ipodata })
+    const ipo = await getActiveIpos();
+    const ipodata = await ipomapsModel.find();
+    res.json({ success: true, ipo: ipo, ipodata: ipodata })
 })
 
 
