@@ -12,6 +12,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
+const path = require('path');
 
 const ipomodel = require('./src/models/ipo');
 
@@ -32,7 +33,6 @@ const adminloginrouter = require('./src/routes/adminloginrouter');
 const multer = require('multer');
 const { log } = require('console');
 const { getIpoSlots, getTotalSlots, getSubscribed, checkSubscription } = require('./src/controllers/Slot');
-const path = require('path');
 const { priceModel } = require('./src/models/prices');
 const { appendPrice, getPriceArray } = require('./src/controllers/Price');
 

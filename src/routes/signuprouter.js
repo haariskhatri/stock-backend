@@ -1,15 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const session = require("express-session");
-const MongoDBSession = require("connect-mongodb-session")(session);
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcrypt")
-const cookieparser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 
 const { addUser } = require('../controllers/User');
 
-const { Server } = require('socket.io');
 const userModel = require('../models/User');
 const UserSession = require('../models/SessionModel');
 const { otpMail } = require('../controllers/Mail');
