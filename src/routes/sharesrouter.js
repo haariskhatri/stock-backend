@@ -3,6 +3,7 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const shareModel = require('../models/share');
 const app = express();
+
 const io = new Server({ cors: { origin: 'http://localhost:5173' } });
 const dotenv = require('dotenv');
 dotenv.config();
